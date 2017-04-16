@@ -1,51 +1,235 @@
 library(shiny)
 library(ggplot2)
 library(dplyr)
+library(tidyr)
 library(plotly)
 library(ggvis)
 
 matches <- read.csv("../data/matches.csv", stringsAsFactors = FALSE)
+ballbyball <- read.csv("../data/deliveries1.csv", stringsAsFactors = FALSE)
+season_map_mapping<-aggregate(id ~ season, matches, c)
+#ballbyball %>% mutate(season = matches[matches$id == match_id,]$season)
+#for(i in 1:nrow(ballbyball))
+#{
+#  print(i)
+#  ballbyball[i,]$season<-matches[matches$id == ballbyball[i,]$match_id,]$season
+#}
 
 shinyServer(function(input, output,session) {
 
-  observeEvent(input$year,{
-    x <- input$team
-    if(input$year != "All")
+  stat_data_tosswon <- reactive({
+    if(input$team_year != "All")
     {
-      mat<-matches %>% filter(season == input$year)
+      matches %>% filter(season == input$team_year) %>% group_by(toss_winner)
     }else
     {
-      mat<-matches
+      matches %>% group_by(toss_winner)
     }
-    updateSelectInput(session, "team",
-                      label = "Team",
-                      choices = sort(unique(c(mat$team1,mat$team2))))
+  })
+  output$stat_tossdecision <- renderPlotly({
+    gg<-ggplot(data = stat_data_tosswon(), aes(toss_winner,fill = toss_winner)) + geom_bar() +
+      ggtitle(paste("Number of tosses won by the teams in ", input$team_year,"season")) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Teams") + ylab("#Tosses Won")
+    plotly::ggplotly(gg)
   })
 
-  matches_tosswon <- reactive({
-    if(input$year != "All")
+  stat_data_matchesPlayed <- reactive({
+    if(input$team_year != "All")
     {
-      matches %>% filter(season == input$year & (team1 == input$team | team2 == input$team)) %>% group_by(toss_winner)
+      matches %>% filter(season == input$team_year) %>% gather(key=team,value=teamname,c(5:6)) %>% group_by(season)
     }else
     {
-      matches %>% filter((team1 == input$team | team2 == input$team)) %>% group_by(toss_winner)
+      matches %>% gather(key=team,value=teamname,c(5:6)) %>% group_by(season)
     }
   })
+  output$stat_matchesPlayed <- renderPlotly({
+    gg<-ggplot(data = stat_data_matchesPlayed(), aes(teamname,fill = teamname)) + geom_bar() +
+      ggtitle(paste("Number of matches played in", input$team_year,  "seasons")) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Season") + ylab("#Matches Played")
+    plotly::ggplotly(gg)
+  })
 
-  matches_tosswinner <- reactive({
-    if(input$year != "All")
+  stat_data_matcheswon <- reactive({
+    if(input$team_year != "All")
     {
-      matches %>% filter(season == input$year & (team1 == input$team | team2 == input$team)) %>% group_by(toss_winner)
+      matches %>% filter(season == input$team_year,winner != "") %>% group_by(winner)
     }else
     {
-      matches %>% filter((team1 == input$team | team2 == input$team)) %>% group_by(toss_winner)
+      matches %>% filter(winner != "") %>% group_by(winner)
     }
   })
+  output$stat_wonmatch <- renderPlotly({
+    gg<-ggplot(data = stat_data_matcheswon(), aes(winner,fill = winner)) + geom_bar() +
+      ggtitle(paste("Number of matches won by teams in ", input$team_year,"season")) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Season") + ylab("#Matches Won")
+    plotly::ggplotly(gg)
+  })
 
-    output$tosswinner <- renderPlotly({
-      gg<-ggplot(data = matches_tosswon(), aes(toss_winner)) + geom_bar() +
-        ggtitle(paste("Number of Tosses won by ", input$team, "in ", input$year,"season"))
-      plotly::ggplotly(gg)
+  stat_data_topbatsmen <- reactive({
+    if(input$team_year != "All")
+    {
+      ballbyball %>% filter(match_id %in% unlist(season_map_mapping[season_map_mapping$season == input$team_year,]$id)) %>% group_by(batsman) %>% summarise(Total.Runs = sum(batsman_runs)) %>% arrange(desc(Total.Runs)) %>% head(n=10)
+    }else
+    {
+      ballbyball %>% group_by(batsman) %>% summarise(Total.Runs = sum(batsman_runs)) %>% arrange(desc(Total.Runs)) %>% head(n=10)
+    }
+  })
+  output$stat_topbatsmen <- renderPlotly({
+    gg<-ggplot(data = stat_data_topbatsmen()) + geom_histogram(aes(x=batsman,y=Total.Runs,fill = batsman),stat = "identity") +
+      ggtitle(paste("Top Batsmen in ", input$team_year,"season")) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Batsman name") + ylab("#Total Runs")
+    plotly::ggplotly(gg)
+  })
+
+  stat_data_topbowler <- reactive({
+    dismissal<-ballbyball %>% select(dismissal_kind) %>% unique() %>% subset(dismissal_kind != c("","retired hurt")) %>% subset(dismissal_kind != c("run out","obstructing the field"))
+    if(input$team_year != "All")
+    {
+      ballbyball %>% filter(match_id %in% unlist(season_map_mapping[season_map_mapping$season == input$team_year,]$id),dismissal_kind %in% dismissal[,1]) %>% select(bowler,batsman,dismissal_kind) %>% count(bowler) %>% arrange(desc(n)) %>% head(n=10)
+    }else
+    {
+      ballbyball %>% filter(dismissal_kind %in% dismissal[,1]) %>% select(bowler,batsman,dismissal_kind) %>% count(bowler) %>% arrange(desc(n)) %>% head(n=10)
+    }
+  })
+  output$stat_topbowler <- renderPlotly({
+    gg<-ggplot(data = stat_data_topbowler()) + geom_histogram(aes(x=bowler,y=n,fill = bowler,label = n),stat = "identity") +
+      ggtitle(paste("Top Bowler in ", input$team_year,"season")) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Bowler name") + ylab("#Wickets")
+    plotly::ggplotly(gg)
+  })
+
+  stat_data_topplayer <- reactive({
+    if(input$team_year != "All")
+    {
+      matches %>% filter(season == input$team_year) %>% group_by(player_of_match) %>% count(player_of_match) %>% arrange(desc(n)) %>% head(n=10)
+    }else
+    {
+      matches %>% group_by(player_of_match) %>% count(player_of_match) %>% arrange(desc(n)) %>% head(n=10)
+    }
+  })
+  output$stat_topplayer <- renderPlotly({
+    gg<-ggplot(data = stat_data_topplayer()) + geom_histogram(aes(x=player_of_match,y=n,fill = player_of_match,label = n),stat = "identity") +
+      ggtitle(paste("Top Player of the match in ", input$team_year,"season")) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Player name") + ylab("#Player of the Match")
+    plotly::ggplotly(gg)
+  })
+
+
+
+  #  observeEvent(input$team_year,{
+  #    x <- input$team_team
+  #    year<-input$team_year
+  #    if(year != "All")
+  #    {
+  #      mat<-matches %>% filter(season == year)
+  #    }else
+  #    {
+  #      mat<-matches
+  #    }
+  #    updateSelectInput(session, "team_team",
+  #                      label = "Team",
+  #                      choices = sort(unique(c(mat$team1,mat$team2))))
+  #  })
+
+  team_data_tosswon <- reactive({
+    matches %>% filter(input$team_team == toss_winner) %>% group_by(season)
+  })
+
+  output$team_tosswinner <- renderPlotly({
+    gg<-ggplot(data = team_data_tosswon(), aes(season,fill = season)) + geom_bar() +
+      ggtitle(paste("Number of Tosses won by ", input$team_team, "across all seasons")) +
+      theme(axis.text.x = element_text(angle = 60, hjust = 1)) + xlab("Teams") + ylab("#Toss Won")
+    plotly::ggplotly(gg)
+  })
+
+  team_data_wonmatch <- reactive({
+    matches %>% filter(input$team_team == winner) %>% group_by(season)
+  })
+
+  output$team_wonmatch <- renderPlotly({
+    gg<-ggplot(data = team_data_wonmatch(), aes(season,fill = season)) + geom_bar() +
+      ggtitle(paste("Number of Tosses won by ", input$team_team, "across all seasons")) +
+      theme(axis.text.x = element_text(angle = 60, hjust = 1)) + xlab("Teams") + ylab("#Tosses Won")
+    plotly::ggplotly(gg)
+  })
+
+
+
+
+
+  #  observeEvent(input$team_year,{
+  #    x <- input$team_team
+  #    year<-input$team_year
+  #    if(year != "All")
+  #    {
+  #      mat<-matches %>% filter(season == year)
+  #    }else
+  #    {
+  #      mat<-matches
+  #    }
+  #    updateSelectInput(session, "team_team",
+  #                      label = "Team",
+  #                      choices = sort(unique(c(mat$team1,mat$team2))))
+  #  })
+
+   observeEvent(input$typeOfChart,{
+     if(input$typeOfChart == "Player of the match")
+     {
+     updateSelectInput(session, "player_name",
+                                            label = "Player Of Match",
+                       choices = sort(unique(matches$player_of_match)),selected = "V Kohli")
+     }else if(input$typeOfChart == "Runs by season")
+     {
+       updateSelectInput(session, "player_name",
+                         label = "Batsmen",
+                         choices = sort(unique(ballbyball$batsman)),selected = "Yuvraj Singh")
+     }else if(input$typeOfChart == "Wickets by season")
+     {
+       updateSelectInput(session, "player_name",
+                         label = "Bowler",
+                         choices = sort(unique(ballbyball$bowler)),selected = "P Kumar")
+     }
     })
 
+  player_data_matchplayer <- reactive({
+    matches %>% filter(input$player_name == player_of_match) %>% group_by(season)
+  })
+
+  player_data_runsbyseason <- reactive({
+    ballbyball %>% filter(input$player_name == batsman) %>% group_by(Season) %>% summarise(Total.Runs = sum(batsman_runs)) %>% arrange(desc(Total.Runs))
+  })
+
+  player_data_wicketsbyseason <- reactive({
+    dismissal<-ballbyball %>% select(dismissal_kind) %>% unique() %>% subset(dismissal_kind != c("","retired hurt")) %>% subset(dismissal_kind != c("run out","obstructing the field"))
+    return(ballbyball %>% filter(dismissal_kind %in% dismissal[,1] & input$player_name == bowler) %>% select(batsman,dismissal_kind,Season) %>% count(Season) %>% arrange(desc(n)))
+
+  })
+
+  output$player_matchplayer <- renderPlotly({
+    if(input$typeOfChart == "Player of the match")
+    {
+      gg<-ggplot(data = player_data_matchplayer(), aes(season,fill = factor(season))) + geom_bar() +
+        ggtitle(paste("Number of player of the match for ", input$player_name, "across all seasons")) +
+        theme(axis.text.x = element_text(angle = 60, hjust = 1)) + xlab("Season") + ylab("#Player of Match Won")
+      plotly::ggplotly(gg)
+    }else if(input$typeOfChart == "Runs by season")
+    {
+      gg<-ggplot(data = player_data_runsbyseason(),aes(x=Season,y=Total.Runs)) + geom_point(aes(color = factor(Season))) +geom_line() +
+      ggtitle(paste("Total Runs for ", input$player_name, "across all seasons")) +
+        theme(axis.text.x = element_text(angle = 60, hjust = 1)) + xlab("Season") + ylab("#Runs")
+      plotly::ggplotly(gg)
+    }else if("Wickets by season")
+    {
+      gg<-ggplot(data = player_data_wicketsbyseason(),aes(x=Season,y=n)) + geom_point() + geom_line() +
+      ggtitle(paste("Total wickets for ", input$player_name, "across all seasons")) +
+        theme(axis.text.x = element_text(angle = 60, hjust = 1)) + xlab("Season") + ylab("#Wickets")
+      plotly::ggplotly(gg)
+    }else
+    {
+      gg<-ggplot(data = player_data_wicketsbyseason(),aes(x=Season,y=n)) + geom_point() + geom_line() +
+        ggtitle(paste("Total wickets for ", input$player_name, "across all seasons")) +
+        theme(axis.text.x = element_text(angle = 60, hjust = 1)) + xlab("Season") + ylab("#Wickets")
+      plotly::ggplotly(gg)
+    }
+  })
 })
