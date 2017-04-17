@@ -21,6 +21,7 @@ shinyUI(navbarPage("T20 Cricket - Indian Premier League (IPL)",
                               tabsetPanel(
                                 tabPanel("Toss Decisions",plotlyOutput("stat_tossdecision")),
                                 tabPanel("Matches played across season",plotlyOutput("stat_matchesPlayed")),
+                                tabPanel("Average Runs by teams",plotlyOutput("stat_avgteamruns")),
                                 tabPanel("Matchs won by each team",plotlyOutput("stat_wonmatch")),
                                 tabPanel("Top Batsman",plotlyOutput("stat_topbatsmen")),
                                 tabPanel("Top Bowler",plotlyOutput("stat_topbowler")),
@@ -45,7 +46,8 @@ shinyUI(navbarPage("T20 Cricket - Indian Premier League (IPL)",
                             mainPanel(
                               tabsetPanel(
                                 tabPanel("Toss Winner",plotlyOutput("team_tosswinner")),
-                                tabPanel("Matchs won by each team",plotlyOutput("team_wonmatch"))
+                                tabPanel("Matchs won by each team",plotlyOutput("team_wonmatch")),
+                                tabPanel("Average Runs across seasons",plotlyOutput("team_avgteamruns"))
                                 #tabPanel("Toss Decision",plotlyOutput("tossdecision")),
                                 #tabPanel("Winning Percentage",plotlyOutput("winningpercentage"))
                               )

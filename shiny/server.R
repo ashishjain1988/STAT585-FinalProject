@@ -8,6 +8,7 @@ library(ggvis)
 matches <- read.csv("../data/matches.csv", stringsAsFactors = FALSE)
 ballbyball <- read.csv("../data/deliveries1.csv", stringsAsFactors = FALSE)
 season_map_mapping<-aggregate(id ~ season, matches, c)
+dataset<-merge(matches,ballbyball,by.x="id",by.y="match_id")
 #ballbyball %>% mutate(season = matches[matches$id == match_id,]$season)
 #for(i in 1:nrow(ballbyball))
 #{
@@ -20,16 +21,39 @@ shinyServer(function(input, output,session) {
   stat_data_tosswon <- reactive({
     if(input$team_year != "All")
     {
-      matches %>% filter(season == input$team_year) %>% group_by(toss_winner)
+      Toss<-matches %>% filter(season == input$team_year) %>% group_by(toss_winner) %>% count() %>% mutate(winner = toss_winner) %>% select(-toss_winner)
+      Match<-matches %>% filter(season == input$team_year) %>% group_by(winner) %>% filter(winner != "") %>%count()
     }else
     {
-      matches %>% group_by(toss_winner)
+      Toss<-matches %>% group_by(toss_winner) %>% count() %>% mutate(winner = toss_winner) %>% select(-toss_winner)
+      Match<-matches %>% group_by(winner) %>% filter(winner != "") %>%count()
     }
+    Toss$name<-"Toss"
+    Match$name<-"Match"
+    return(rbind(Match,Toss))
+
   })
   output$stat_tossdecision <- renderPlotly({
-    gg<-ggplot(data = stat_data_tosswon(), aes(toss_winner,fill = toss_winner)) + geom_bar() +
+    gg<-ggplot(stat_data_tosswon(), aes(winner,n, fill = name)) + geom_histogram(position = "dodge",stat = "identity") +
       ggtitle(paste("Number of tosses won by the teams in ", input$team_year,"season")) +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Teams") + ylab("#Tosses Won")
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Teams") + ylab("#Matches")
+    plotly::ggplotly(gg)
+  })
+
+
+  stat_data_avgteamruns <- reactive({
+    if(input$team_year != "All")
+    {
+      teamtotalruns <- ballbyball %>% filter(Season == input$team_year) %>% group_by(batting_team, match_id) %>% summarise(totalscore = sum(total_runs))
+    }else
+    {
+      teamtotalruns <- ballbyball %>% group_by(batting_team, Season) %>% summarise(totalscore = sum(total_runs))
+    }
+  })
+  output$stat_avgteamruns <- renderPlotly({
+    gg<-ggplot(stat_data_avgteamruns(), aes(x=batting_team, y = totalscore,fill = batting_team)) + geom_boxplot() +
+      ggtitle(paste("Number of tosses won by the teams in ", input$team_year,"season")) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Teams") + ylab("#Total Score")
     plotly::ggplotly(gg)
   })
 
@@ -136,9 +160,9 @@ shinyServer(function(input, output,session) {
   })
 
   output$team_tosswinner <- renderPlotly({
-    gg<-ggplot(data = team_data_tosswon(), aes(season,fill = season)) + geom_bar() +
+    gg<-ggplot(data = team_data_tosswon(), aes(x=season,fill = factor(season))) + geom_bar() +
       ggtitle(paste("Number of Tosses won by ", input$team_team, "across all seasons")) +
-      theme(axis.text.x = element_text(angle = 60, hjust = 1)) + xlab("Teams") + ylab("#Toss Won")
+       xlab("Teams") + ylab("#Toss Won")
     plotly::ggplotly(gg)
   })
 
@@ -147,13 +171,21 @@ shinyServer(function(input, output,session) {
   })
 
   output$team_wonmatch <- renderPlotly({
-    gg<-ggplot(data = team_data_wonmatch(), aes(season,fill = season)) + geom_bar() +
+    gg<-ggplot(data = team_data_wonmatch(), aes(x=season,fill = factor(season))) + geom_bar() +
       ggtitle(paste("Number of Tosses won by ", input$team_team, "across all seasons")) +
-      theme(axis.text.x = element_text(angle = 60, hjust = 1)) + xlab("Teams") + ylab("#Tosses Won")
+      xlab("Season") + ylab("#Tosses Won")
     plotly::ggplotly(gg)
   })
 
-
+  team_data_avgteamruns <- reactive({
+    teamtotalruns <- ballbyball %>% filter(input$team_team == batting_team) %>% group_by(match_id, Season) %>% summarise(totalscore = sum(total_runs))
+  })
+  output$team_avgteamruns <- renderPlotly({
+    gg<-ggplot(team_data_avgteamruns(), aes(x=Season, y = totalscore,fill = factor(Season))) + geom_boxplot() +
+      ggtitle(paste("Number of tosses won by the teams in ", input$team_year,"season")) +
+      xlab("Season") + ylab("#Total Score")
+    plotly::ggplotly(gg)
+  })
 
 
 
