@@ -86,7 +86,7 @@ shinyServer(function(input, output,session) {
   stat_data_topbatsmen <- reactive({
     if(input$team_year != "All")
     {
-      ballbyball %>% filter(match_id %in% unlist(season_map_mapping[season_map_mapping$season == input$team_year,]$id)) %>% group_by(batsman) %>% summarise(Total.Runs = sum(batsman_runs)) %>% arrange(desc(Total.Runs)) %>% head(n=10)
+      ballbyball %>% filter(input$team_year == Season) %>% group_by(batsman) %>% summarise(Total.Runs = sum(batsman_runs)) %>% arrange(desc(Total.Runs)) %>% head(n=10)
     }else
     {
       ballbyball %>% group_by(batsman) %>% summarise(Total.Runs = sum(batsman_runs)) %>% arrange(desc(Total.Runs)) %>% head(n=10)
@@ -94,7 +94,7 @@ shinyServer(function(input, output,session) {
 
   })
   output$stat_topbatsmen <- renderPlotly({
-    gg<-ggplot(data = stat_data_topbatsmen()) + geom_histogram(aes(x=batsman,y=Total.Runs,fill = batsman),stat = "identity") +
+    gg<-ggplot(data = stat_data_topbatsmen()) + geom_histogram(aes(x=batsman,y=Total.Runs,fill = batsman),stat = "identity") + geom_text(aes(x=batsman,y=Total.Runs+50,label=Total.Runs)) +
       ggtitle(paste("Top Batsmen in ", input$team_year,"season")) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Batsman name") + ylab("#Total Runs")
     plotly::ggplotly(gg)
@@ -104,14 +104,14 @@ shinyServer(function(input, output,session) {
     dismissal<-ballbyball %>% select(dismissal_kind) %>% unique() %>% subset(dismissal_kind != c("","retired hurt")) %>% subset(dismissal_kind != c("run out","obstructing the field"))
     if(input$team_year != "All")
     {
-      ballbyball %>% filter(match_id %in% unlist(season_map_mapping[season_map_mapping$season == input$team_year,]$id),dismissal_kind %in% dismissal[,1]) %>% select(bowler,batsman,dismissal_kind) %>% count(bowler) %>% arrange(desc(n)) %>% head(n=10)
+      ballbyball %>% filter(input$team_year == Season,dismissal_kind %in% dismissal[,1]) %>% select(bowler,batsman,dismissal_kind) %>% count(bowler) %>% arrange(desc(n)) %>% head(n=10)
     }else
     {
       ballbyball %>% filter(dismissal_kind %in% dismissal[,1]) %>% select(bowler,batsman,dismissal_kind) %>% count(bowler) %>% arrange(desc(n)) %>% head(n=10)
     }
   })
   output$stat_topbowler <- renderPlotly({
-    gg<-ggplot(data = stat_data_topbowler()) + geom_histogram(aes(x=bowler,y=n,fill = bowler,label = n),stat = "identity") +
+    gg<-ggplot(data = stat_data_topbowler()) + geom_histogram(aes(x=bowler,y=n,fill = bowler),stat = "identity") + geom_text(aes(x=bowler,y=n+3,label=n)) +
       ggtitle(paste("Top Bowler in ", input$team_year,"season")) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Bowler name") + ylab("#Wickets")
     plotly::ggplotly(gg)
@@ -127,7 +127,7 @@ shinyServer(function(input, output,session) {
     }
   })
   output$stat_topplayer <- renderPlotly({
-    gg<-ggplot(data = stat_data_topplayer()) + geom_histogram(aes(x=player_of_match,y=n,fill = player_of_match,label = n),stat = "identity") +
+    gg<-ggplot(data = stat_data_topplayer()) + geom_histogram(aes(x=player_of_match,y=n,fill = player_of_match),stat = "identity") + geom_text(aes(x=player_of_match,y=n+0.25,label=n)) +
       ggtitle(paste("Top Player of the match in ", input$team_year,"season")) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Player name") + ylab("#Player of the Match")
     plotly::ggplotly(gg)
@@ -257,7 +257,6 @@ shinyServer(function(input, output,session) {
 
   player_data_runsbyseason <- reactive({
     ballbyball %>% filter(input$player_name == batsman) %>% group_by(Season,match_id) %>% summarise(totalscore = sum(batsman_runs))
-    #ballbyball %>% filter(input$team_team == batting_team) %>% group_by(match_id, Season) %>% summarise(totalscore = sum(total_runs))
   })
 
   player_data_wicketsbyseason <- reactive({
