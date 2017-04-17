@@ -13,7 +13,8 @@ season_map_mapping<-aggregate(id ~ season, matches, c)
 shinyUI(navbarPage("T20 Cricket - Indian Premier League (IPL)",
                    tabPanel("By Season",
                             sidebarPanel(
-                              selectInput("team_year","Season",choices = c("All",sort(unique(matches$season))),selected = "All")
+                              selectInput("team_year","Season",choices = c("All",sort(unique(matches$season))),selected = "All"),
+                              sliderInput("team_range", "Minimum Season Played:", min = 1, max = 9, value = 5)
                               #selectInput("team_team","Team",choices = c("All",sort(unique(c(matches$team1,matches$team2)))),selected="All")
                               #selectInput("team_venue","Venue",choices = sort(unique(c(matches$city))),selected = "Delhi")
                             ),
@@ -40,6 +41,7 @@ shinyUI(navbarPage("T20 Cricket - Indian Premier League (IPL)",
                    tabPanel("By Team",
                             sidebarPanel(
                               selectInput("team_team","Team",choices = sort(unique(c(matches$team1,matches$team2)))),
+                              sliderInput("team_range1", "Season Played:", min = 1, max = 9, value = 5),
                               selectInput("team_venue","Venue",choices = sort(unique(c(matches$city))),selected = "Delhi")
                             ),
                             mainPanel(
@@ -54,6 +56,7 @@ shinyUI(navbarPage("T20 Cricket - Indian Premier League (IPL)",
                    tabPanel("By Player",
                             sidebarPanel(
                               selectInput("player_name","Batsmen",choices = sort(unique(ballbyball$batsman))),
+                              sliderInput("player_range", "Season Played:", min = 1, max = 9, value = 5),
                               radioButtons("typeOfChart", label = "Type of Chart",
                                            choices = list("Player of the match",
                                                               "Runs by season",

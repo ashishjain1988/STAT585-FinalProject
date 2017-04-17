@@ -30,12 +30,13 @@ shinyServer(function(input, output,session) {
     }
     Toss$name<-"Toss"
     Match$name<-"Match"
-    return(rbind(Match,Toss))
+    team_seasons<-matches %>% gather(key=team,value=teamname,c(5:6)) %>% distinct(season,teamname) %>% group_by(teamname) %>% count() %>% filter(n>=input$team_range)
+    return(rbind(Match,Toss) %>% filter(winner %in% team_seasons$teamname))
 
   })
   output$stat_tossdecision <- renderPlotly({
     gg<-ggplot(stat_data_tosswon(), aes(winner,n, fill = name)) + geom_histogram(position = "dodge",stat = "identity") +
-      ggtitle(paste("Number of tosses won by the teams in ", input$team_year,"season")) +
+      ggtitle(paste("Number of tosses won by the teams in", input$team_year, "season and played at least",input$team_range,"seasons")) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Teams") + ylab("#Matches")
     plotly::ggplotly(gg)
   })
@@ -49,6 +50,8 @@ shinyServer(function(input, output,session) {
     {
       teamtotalruns <- ballbyball %>% group_by(batting_team, Season) %>% summarise(totalscore = sum(total_runs))
     }
+    team_seasons<-matches %>% gather(key=team,value=teamname,c(5:6)) %>% distinct(season,teamname) %>% group_by(teamname) %>% count() %>% filter(n>=input$team_range)
+    return(teamtotalruns %>% filter(batting_team %in% team_seasons$teamname))
   })
   output$stat_avgteamruns <- renderPlotly({
     gg<-ggplot(stat_data_avgteamruns(), aes(x=batting_team, y = totalscore,fill = batting_team)) + geom_boxplot() +
@@ -70,7 +73,8 @@ shinyServer(function(input, output,session) {
     }
     winner$name<-"Winner"
     total$name<-"Total Played"
-    return(rbind(winner,total))
+    team_seasons<-matches %>% gather(key=team,value=teamname,c(5:6)) %>% distinct(season,teamname) %>% group_by(teamname) %>% count() %>% filter(n>=input$team_range)
+    return(rbind(winner,total) %>% filter(teamname %in% team_seasons$teamname))
   })
   output$stat_matchesPlayed <- renderPlotly({
     gg<-ggplot(stat_data_matchesPlayed(), aes(teamname,n, fill = name)) + geom_histogram(position = "dodge",stat = "identity") +
@@ -87,6 +91,7 @@ shinyServer(function(input, output,session) {
     {
       ballbyball %>% group_by(batsman) %>% summarise(Total.Runs = sum(batsman_runs)) %>% arrange(desc(Total.Runs)) %>% head(n=10)
     }
+
   })
   output$stat_topbatsmen <- renderPlotly({
     gg<-ggplot(data = stat_data_topbatsmen()) + geom_histogram(aes(x=batsman,y=Total.Runs,fill = batsman),stat = "identity") +
@@ -145,8 +150,15 @@ shinyServer(function(input, output,session) {
   #                      choices = sort(unique(c(mat$team1,mat$team2))))
   #  })
 
+  observeEvent(input$team_range1,{
+
+    team_seasons<-matches %>% gather(key=team,value=teamname,c(5:6)) %>% distinct(season,teamname) %>% group_by(teamname) %>% count() %>% filter(n>=input$team_range1)
+    updateSelectInput(session, "team_team",
+                      label = "Team",
+                      choices = team_seasons$teamname)
+  })
+
   team_data_tosswon <- reactive({
-    #matches %>% filter(input$team_team == toss_winner) %>% group_by(season)
     Toss<-matches %>% filter(input$team_team == toss_winner) %>% group_by(season) %>% count()
     Match<-matches %>% filter(input$team_team == winner) %>% group_by(season) %>% filter(winner != "") %>%count()
     Toss$name<-"Toss"
@@ -192,21 +204,52 @@ shinyServer(function(input, output,session) {
    observeEvent(input$typeOfChart,{
      if(input$typeOfChart == "Player of the match")
      {
-     updateSelectInput(session, "player_name",
+      player_seasons<-ballbyball %>% distinct(Season,batsman) %>% group_by(batsman) %>% count() %>% filter(n>=input$player_range)
+      players<-data.frame(player=sort(unique(matches$player_of_match))) %>% filter(player %in% player_seasons$batsman) %>% filter(player != "")
+      updateSelectInput(session, "player_name",
                                             label = "Player Of Match",
-                       choices = sort(unique(matches$player_of_match)),selected = "V Kohli")
+                       choices = players[,1],selected = "V Kohli")
      }else if(input$typeOfChart == "Runs by season")
      {
+       player_seasons<-ballbyball %>% distinct(Season,batsman) %>% group_by(batsman) %>% count() %>% filter(n>=input$player_range)
+       players<-data.frame(player=sort(unique(ballbyball$batsman))) %>% filter(player %in% player_seasons$batsman) %>% filter(player != "")
        updateSelectInput(session, "player_name",
                          label = "Batsmen",
-                         choices = sort(unique(ballbyball$batsman)),selected = "Yuvraj Singh")
+                         choices = players[,1],selected = "V Kohli")
      }else if(input$typeOfChart == "Wickets by season")
      {
+       player_seasons<-ballbyball %>% distinct(Season,bowler) %>% group_by(bowler) %>% count() %>% filter(n>=input$player_range)
+       players<-data.frame(player=sort(unique(ballbyball$bowler))) %>% filter(player %in% player_seasons$bowler) %>% filter(player != "")
        updateSelectInput(session, "player_name",
                          label = "Bowler",
-                         choices = sort(unique(ballbyball$bowler)),selected = "P Kumar")
+                         choices = players[,1],selected = "P Kumar")
      }
     })
+
+   observeEvent(input$player_range,{
+     if(input$typeOfChart == "Player of the match")
+     {
+       player_seasons<-ballbyball %>% distinct(Season,batsman) %>% group_by(batsman) %>% count() %>% filter(n>=input$player_range)
+       players<-data.frame(player=sort(unique(matches$player_of_match))) %>% filter(player %in% player_seasons$batsman) %>% filter(player != "")
+       updateSelectInput(session, "player_name",
+                         label = "Player Of Match",
+                         choices = players[,1],selected = "V Kohli")
+     }else if(input$typeOfChart == "Runs by season")
+     {
+       player_seasons<-ballbyball %>% distinct(Season,batsman) %>% group_by(batsman) %>% count() %>% filter(n>=input$player_range)
+       players<-data.frame(player=sort(unique(ballbyball$batsman))) %>% filter(player %in% player_seasons$batsman) %>% filter(player != "")
+       updateSelectInput(session, "player_name",
+                         label = "Batsmen",
+                         choices = players[,1],selected = "V Kohli")
+     }else if(input$typeOfChart == "Wickets by season")
+     {
+       player_seasons<-ballbyball %>% distinct(Season,bowler) %>% group_by(bowler) %>% count() %>% filter(n>=input$player_range)
+       players<-data.frame(player=sort(unique(ballbyball$bowler))) %>% filter(player %in% player_seasons$bowler) %>% filter(player != "")
+       updateSelectInput(session, "player_name",
+                         label = "Bowler",
+                         choices = players[,1],selected = "P Kumar")
+     }
+   })
 
   player_data_matchplayer <- reactive({
     matches %>% filter(input$player_name == player_of_match) %>% group_by(season)
