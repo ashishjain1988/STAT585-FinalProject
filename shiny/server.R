@@ -4,11 +4,15 @@ library(dplyr)
 library(tidyr)
 library(plotly)
 library(ggvis)
+library(ggmap)
+library(rworldmap)
 
 matches <- read.csv("../data/matches.csv", stringsAsFactors = FALSE)
 ballbyball <- read.csv("../data/deliveries1.csv", stringsAsFactors = FALSE)
-season_map_mapping<-aggregate(id ~ season, matches, c)
-dataset<-merge(matches,ballbyball,by.x="id",by.y="match_id")
+#season_map_mapping<-aggregate(id ~ season, matches, c)
+#dataset<-merge(matches,ballbyball,by.x="id",by.y="match_id")
+location<-read.csv("../data/location_mapping.csv", stringsAsFactors = FALSE,row.names = 1,header = T)
+location[,"city"]<-row.names(location)
 #ballbyball %>% mutate(season = matches[matches$id == match_id,]$season)
 #for(i in 1:nrow(ballbyball))
 #{
@@ -182,6 +186,28 @@ shinyServer(function(input, output,session) {
       ggtitle(paste("Number of tosses won by the teams in ", input$team_year,"season")) +
       xlab("Season") + ylab("#Total Score")
     plotly::ggplotly(gg)
+  })
+
+  team_data_locationcount <- reactive({
+    matchl <- matches %>% gather(key=team,value=teamname,c(5:6)) %>% filter(teamname == input$team_team) %>% select(teamname,city) %>%group_by(city) %>% count()
+    matchlocation<-merge(matchl,location,by.x="city",by.y="city")
+  })
+  output$team_locations <- renderPlot({
+    if(unique(team_data_locationcount()$V3) > 1)
+    {
+      mapWorld <- borders("world", colour="gray50", fill="gray50")
+      mp <- mapWorld + ggplot(data = team_data_locationcount(),aes(x=lon, y=lat)) + geom_point(aes(color="red", size=3)) +
+        geom_label_repel(aes(lon, lat, label = city),fontface = 'bold', color = 'white',box.padding = unit(0.35, "lines"),point.padding = unit(0.5, "lines"),segment.color = 'grey50') +
+        theme_classic(base_size = 16)
+      mp
+    }else
+    {
+      map <- get_map(location = distinct(team_data_locationcount()$V3), zoom = 4)
+      ggmap(map) + geom_point(data = team_data_locationcount(),aes(x=lon,y=lat,size=3)) +
+        geom_label_repel(aes(lon, lat, label = city),fontface = 'bold', color = 'white',box.padding = unit(0.35, "lines"),point.padding = unit(0.5, "lines"),segment.color = 'grey50') +
+        theme_classic(base_size = 16)
+    }
+
   })
 
 

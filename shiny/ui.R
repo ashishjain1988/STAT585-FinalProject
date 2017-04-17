@@ -4,6 +4,8 @@ library(dplyr)
 library(tidyr)
 library(plotly)
 library(ggvis)
+library(ggmap)
+library(rworldmap)
 
 matches <- read.csv("../data/matches.csv", stringsAsFactors = FALSE)
 ballbyball <- read.csv("../data/deliveries1.csv", stringsAsFactors = FALSE)
@@ -41,13 +43,14 @@ shinyUI(navbarPage("T20 Cricket - Indian Premier League (IPL)",
                    tabPanel("By Team",
                             sidebarPanel(
                               selectInput("team_team","Team",choices = sort(unique(c(matches$team1,matches$team2)))),
-                              sliderInput("team_range1", "Season Played:", min = 1, max = 9, value = 5),
-                              selectInput("team_venue","Venue",choices = sort(unique(c(matches$city))),selected = "Delhi")
+                              sliderInput("team_range1", "Season Played:", min = 1, max = 9, value = 5)
+                              # selectInput("team_venue","Venue",choices = sort(unique(c(matches$city))),selected = "Delhi")
                             ),
                             mainPanel(
                               tabsetPanel(
                                 tabPanel("Toss Winner",plotlyOutput("team_tosswinner")),
-                                tabPanel("Average Runs across seasons",plotlyOutput("team_avgteamruns"))
+                                tabPanel("Average Runs across seasons",plotlyOutput("team_avgteamruns")),
+                                tabPanel("Locations of Matches",plotOutput("team_locations"))
                                 #tabPanel("Toss Decision",plotlyOutput("tossdecision")),
                                 #tabPanel("Winning Percentage",plotlyOutput("winningpercentage"))
                               )
