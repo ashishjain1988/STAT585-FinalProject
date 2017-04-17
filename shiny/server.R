@@ -270,7 +270,7 @@ shinyServer(function(input, output,session) {
     {
       gg<-ggplot(data = player_data_matchplayer(), aes(season,fill = factor(season))) + geom_bar() +
         ggtitle(paste("Number of player of the match for ", input$player_name, "across all seasons")) +
-        theme(axis.text.x = element_text(angle = 60, hjust = 1)) + xlab("Season") + ylab("#Player of Match Won")
+        xlab("Season") + ylab("#Player of Match Won")
       plotly::ggplotly(gg)
     }else if(input$typeOfChart == "Runs by season")
     {
@@ -278,9 +278,9 @@ shinyServer(function(input, output,session) {
       ggtitle(paste("Total Runs for ", input$player_name, "across all seasons")) +
         xlab("Season") + ylab("#Runs")
       plotly::ggplotly(gg)
-    }else if("Wickets by season")
+    }else if(input$typeOfChart == "Wickets by season")
     {
-      gg<-ggplot(data = player_data_wicketsbyseason(),aes(x=Season,y=n)) + geom_point() + geom_line() +
+      gg<-ggplot(data = player_data_wicketsbyseason(),aes(x=Season,y=n)) + geom_point(aes(color=factor(Season))) + geom_line() +
       ggtitle(paste("Total wickets for ", input$player_name, "across all seasons")) +
         theme(axis.text.x = element_text(angle = 60, hjust = 1)) + xlab("Season") + ylab("#Wickets")
       plotly::ggplotly(gg)
