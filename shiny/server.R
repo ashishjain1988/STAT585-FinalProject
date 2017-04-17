@@ -60,32 +60,22 @@ shinyServer(function(input, output,session) {
   stat_data_matchesPlayed <- reactive({
     if(input$team_year != "All")
     {
-      matches %>% filter(season == input$team_year) %>% gather(key=team,value=teamname,c(5:6)) %>% group_by(season)
+      winner<-matches %>% filter(winner != "") %>% group_by(winner) %>% count() %>% mutate(teamname = winner) %>% select(-winner)
+      total<-matches %>% gather(key=team,value=teamname,c(5:6)) %>% group_by(teamname) %>% count()
+
     }else
     {
-      matches %>% gather(key=team,value=teamname,c(5:6)) %>% group_by(season)
+      winner<-matches %>% filter(winner != "") %>% group_by(winner) %>% count() %>% mutate(teamname = winner) %>% select(-winner)
+      total<-matches %>% gather(key=team,value=teamname,c(5:6)) %>% group_by(teamname) %>% count()
     }
+    winner$name<-"Winner"
+    total$name<-"Total Played"
+    return(rbind(winner,total))
   })
   output$stat_matchesPlayed <- renderPlotly({
-    gg<-ggplot(data = stat_data_matchesPlayed(), aes(teamname,fill = teamname)) + geom_bar() +
+    gg<-ggplot(stat_data_matchesPlayed(), aes(teamname,n, fill = name)) + geom_histogram(position = "dodge",stat = "identity") +
       ggtitle(paste("Number of matches played in", input$team_year,  "seasons")) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Season") + ylab("#Matches Played")
-    plotly::ggplotly(gg)
-  })
-
-  stat_data_matcheswon <- reactive({
-    if(input$team_year != "All")
-    {
-      matches %>% filter(season == input$team_year,winner != "") %>% group_by(winner)
-    }else
-    {
-      matches %>% filter(winner != "") %>% group_by(winner)
-    }
-  })
-  output$stat_wonmatch <- renderPlotly({
-    gg<-ggplot(data = stat_data_matcheswon(), aes(winner,fill = winner)) + geom_bar() +
-      ggtitle(paste("Number of matches won by teams in ", input$team_year,"season")) +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Season") + ylab("#Matches Won")
     plotly::ggplotly(gg)
   })
 
@@ -156,24 +146,19 @@ shinyServer(function(input, output,session) {
   #  })
 
   team_data_tosswon <- reactive({
-    matches %>% filter(input$team_team == toss_winner) %>% group_by(season)
+    #matches %>% filter(input$team_team == toss_winner) %>% group_by(season)
+    Toss<-matches %>% filter(input$team_team == toss_winner) %>% group_by(season) %>% count()
+    Match<-matches %>% filter(input$team_team == winner) %>% group_by(season) %>% filter(winner != "") %>%count()
+    Toss$name<-"Toss"
+    Match$name<-"Match"
+    return(rbind(Match,Toss))
+
   })
 
   output$team_tosswinner <- renderPlotly({
-    gg<-ggplot(data = team_data_tosswon(), aes(x=season,fill = factor(season))) + geom_bar() +
+    gg<-ggplot(team_data_tosswon(), aes(season,n, fill = name)) + geom_histogram(position = "dodge",stat = "identity") +
       ggtitle(paste("Number of Tosses won by ", input$team_team, "across all seasons")) +
        xlab("Teams") + ylab("#Toss Won")
-    plotly::ggplotly(gg)
-  })
-
-  team_data_wonmatch <- reactive({
-    matches %>% filter(input$team_team == winner) %>% group_by(season)
-  })
-
-  output$team_wonmatch <- renderPlotly({
-    gg<-ggplot(data = team_data_wonmatch(), aes(x=season,fill = factor(season))) + geom_bar() +
-      ggtitle(paste("Number of Tosses won by ", input$team_team, "across all seasons")) +
-      xlab("Season") + ylab("#Tosses Won")
     plotly::ggplotly(gg)
   })
 
