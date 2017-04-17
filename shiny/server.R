@@ -213,7 +213,8 @@ shinyServer(function(input, output,session) {
   })
 
   player_data_runsbyseason <- reactive({
-    ballbyball %>% filter(input$player_name == batsman) %>% group_by(Season) %>% summarise(Total.Runs = sum(batsman_runs)) %>% arrange(desc(Total.Runs))
+    ballbyball %>% filter(input$player_name == batsman) %>% group_by(Season,match_id) %>% summarise(totalscore = sum(batsman_runs))
+    #ballbyball %>% filter(input$team_team == batting_team) %>% group_by(match_id, Season) %>% summarise(totalscore = sum(total_runs))
   })
 
   player_data_wicketsbyseason <- reactive({
@@ -231,9 +232,9 @@ shinyServer(function(input, output,session) {
       plotly::ggplotly(gg)
     }else if(input$typeOfChart == "Runs by season")
     {
-      gg<-ggplot(data = player_data_runsbyseason(),aes(x=Season,y=Total.Runs)) + geom_point(aes(color = factor(Season))) +geom_line() +
+      gg<-ggplot(player_data_runsbyseason(), aes(x=Season, y = totalscore,fill = factor(Season))) + geom_boxplot() +
       ggtitle(paste("Total Runs for ", input$player_name, "across all seasons")) +
-        theme(axis.text.x = element_text(angle = 60, hjust = 1)) + xlab("Season") + ylab("#Runs")
+        xlab("Season") + ylab("#Runs")
       plotly::ggplotly(gg)
     }else if("Wickets by season")
     {
