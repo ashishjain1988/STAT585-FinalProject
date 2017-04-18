@@ -14,7 +14,7 @@ The GitHub repository which I am using for this project is https://github.com/as
 \section{Introduction}
 
 \section{Dataset}
-As mentioned in the earlier section, the IPL dataset has been available at [Cricsheet website](http://cricsheet.org/downloads/). The raw data consists ball by ball details (including bowler, batsmen, run scored, match, and teams.) individually for every match (577 files). These files also consists the meta information about the match including the the venue, toss winner, match winner, stadium and city. Our aim was first to process the data and make it tidy but this step has already done previously. For our project, we downloaded and used the processed data from [Kaggle](https://www.kaggle.com/manasgarg/ipl). The processed data consists of two files. The first file, `matches.csv` consists of meta-information about all the matches as described earlier as a comma seperated file. The second file, `deliveries.csv` consists of the ball by ball information of the matches. These files have a common identifier called as "match_id" which is the linking key for these two files.
+As mentioned earlier, the IPL dataset has been available at [Cricsheet website](http://cricsheet.org/downloads/). The raw data consists ball by ball details (including bowler, batsmen, run scored, match, and teams.) individually for every match (577 files). These files also consists the meta information about the match including the the venue, toss winner, match winner, stadium and city. Our aim was first to process the data and make it tidy but this step has already done previously. For our project, we downloaded and used the processed data from [Kaggle](https://www.kaggle.com/manasgarg/ipl). The processed data consists of two files. The first file, `matches.csv` consists of meta-information about all the matches as described earlier as a comma seperated file. The second file, `deliveries.csv` consists of the ball by ball information of the matches. These files have a common identifier called as "match_id" which is the linking key for these two files.
 ```
 library(tidyr)
 library(plotly)
@@ -56,25 +56,40 @@ write.csv(points,"../data/location_mapping.csv")
 ```
 
 \section{Results}
-In this section, we will talk about the 
-\subsection{Analysis of data across seasons}
+In this section, we will discuss about different features of the developed shiny application and its interactivity. The shiny application has three different tabs which is based on the visulization of data based on IPL season, Team, and Player.
+
+\subsection{IPL seasons analysis}
+In this section, the user can visualize and analyze the data grouped together by the season. The user can use various plots which are described below for a specific season by selecting the season in the select widget. In addition to that, the user can also filter the teams or players by selecting the minimum number of seasons played through the sliderbar. Now we talk about the different plots that are there in the shiny application.
+
 \subsubsection{Toss Winner}
+This plot compares the count of toss and match winner across different teams in a season. The information is displayed as a histogram. This plot can be used to see the effect of winning the toss on the match result for teams. The user can also hovers over the bars and get the details. For example,<One plot for this>
+
 \subsubsection{Comparison of total matches played and won}
-####3.1.3 Comparison of average runs scored by teams 
-####3.1.4 Top batsmen
-####3.1.5 Top Bowler
+This plot compares the total matchs played and total match won across different teams in a season. The information is displayed as a histogram. This plot can be used to check the performace of the teams in a season. This will also tells us the winner of a particular season. The user can also hovers over the bars and get the details. For example,<One plot for this>
 
-##3.2 Analysis of the teams
-###3.2.1 Comparison of total matches played and won
-####3.2.2 Comparison of average runs scored
+\subsubsection{Comparison of average runs scored by teams}
+This plot compares the average runs scored across different teams in a season. The information is displayed as a boxplot. This plot can be used to check the performace of the teams in a season by displaying their batting performance of the teams in a season. The user can also hovers over the bars and get the details about the mean, outlier scores, upper and lower quartile. For example,<One plot for this>
 
-##3.3 Analysis of player's performance
-####3.3.1 Player of match awards
-####3.3.2 Average runs scored across seasons
-####3.3.3 Total Wickets
+\subsubsection{Top batsmen}
+This plot compares the total runs scored by batsmen in a season. The information is displayed as a histogram. This plot shows the top 10 batsmen in a season based on the number of runs scored. The number of runs scored by the batsmen are displayed above the plot. For example,<One plot for this>
 
-\subsection{Shiny Application}
+\subsubsection{Top Bowler}
+This plot compares the total runs scored by batsmen in a season. The information is displayed as a histogram. This plot shows the top 10 batsmen in a season based on the number of runs scored. The number of runs scored by the batsmen are displayed above the plot. For example,<One plot for this>
 
-\section{Outcomes}
+\subsection{Team performance Analysis}
+In this section, the user can visualize and analyze the data grouped together for a team across all seasons. The user can use various plots which are described below for a team by selecting the team in the select widget. In addition to that, the user can also filter the teams by selecting the minimum number of seasons played through the sliderbar (Automatic updation of team select widget). Now we talk about the different plots that are there for this.
+
+\subsubsection{Comparison of total matches played and won}
+\subsubsection{Comparison of average runs scored}
+\subsubsection{Venue Details}
+
+\subsection{Player's performance analysis}
+In this section, the user can visualize and analyze the data grouped for a player across all seasons. The user can use various plots which are described below for a player to analyze his performace by selecting the player in the select widget. In addition to that, the user can also filter the players by selecting the minimum number of seasons played through the sliderbar (Automatic updation of player select widget).
+
+\subsubsection{Player of match awards}
+\subsubsection{Average runs scored across seasons}
+\subsubsection{Total Wickets}
+
+\section{Discussion}
 
 \section{Future Work}
