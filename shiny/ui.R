@@ -6,6 +6,7 @@ library(plotly)
 library(ggvis)
 library(ggmap)
 library(rworldmap)
+library(ggrepel)
 
 matches <- read.csv("../data/matches.csv", stringsAsFactors = FALSE)
 ballbyball <- read.csv("../data/deliveries1.csv", stringsAsFactors = FALSE)

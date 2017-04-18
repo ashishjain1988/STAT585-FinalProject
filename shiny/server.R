@@ -6,6 +6,7 @@ library(plotly)
 library(ggvis)
 library(ggmap)
 library(rworldmap)
+library(ggrepel)
 
 matches <- read.csv("../data/matches.csv", stringsAsFactors = FALSE)
 ballbyball <- read.csv("../data/deliveries1.csv", stringsAsFactors = FALSE)
@@ -191,21 +192,26 @@ shinyServer(function(input, output,session) {
   team_data_locationcount <- reactive({
     matchl <- matches %>% gather(key=team,value=teamname,c(5:6)) %>% filter(teamname == input$team_team) %>% select(teamname,city) %>%group_by(city) %>% count()
     matchlocation<-merge(matchl,location,by.x="city",by.y="city")
+    row.names(matchlocation)<-matchlocation$city
+    return(matchlocation)
   })
   output$team_locations <- renderPlot({
-    if(unique(team_data_locationcount()$V3) > 1)
+    matchlocation<-team_data_locationcount()
+    if(length(unique(team_data_locationcount()$V3)) > 1)
     {
+      mp<-NULL
       mapWorld <- borders("world", colour="gray50", fill="gray50")
-      mp <- mapWorld + ggplot(data = team_data_locationcount(),aes(x=lon, y=lat)) + geom_point(aes(color="red", size=3)) +
-        geom_label_repel(aes(lon, lat, label = city),fontface = 'bold', color = 'white',box.padding = unit(0.35, "lines"),point.padding = unit(0.5, "lines"),segment.color = 'grey50') +
-        theme_classic(base_size = 16)
+      mp<- ggplot(data = team_data_locationcount()) + mapWorld
+      mp <- mp + geom_point(aes(x=lon, y=lat),color="blue", size=3) +
+        geom_label_repel(aes(lon, lat, label = city),fontface = 'bold', color = 'red',box.padding = unit(0.35, "lines"),point.padding = unit(0.5, "lines"),segment.color = 'black') +
+        theme_classic(base_size = 10)
       mp
     }else
     {
-      map <- get_map(location = distinct(team_data_locationcount()$V3), zoom = 4)
-      ggmap(map) + geom_point(data = team_data_locationcount(),aes(x=lon,y=lat,size=3)) +
-        geom_label_repel(aes(lon, lat, label = city),fontface = 'bold', color = 'white',box.padding = unit(0.35, "lines"),point.padding = unit(0.5, "lines"),segment.color = 'grey50') +
-        theme_classic(base_size = 16)
+      map <- get_map(location = unique(team_data_locationcount()$V3), zoom = 4)
+      ggmap(map) + geom_point(data = team_data_locationcount(),aes(x=lon,y=lat)) +
+        geom_label_repel(data = team_data_locationcount(),aes(lon, lat, label = city),fontface = 'bold', color = 'red',box.padding = unit(0.35, "lines"),point.padding = unit(0.5, "lines"),segment.color = 'grey50') +
+        theme_classic(base_size = 10)
     }
 
   })
