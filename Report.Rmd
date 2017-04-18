@@ -5,29 +5,40 @@ date: "`r format(Sys.time(), '%d %B %Y')`"
 author: "Ashish Jain"
 output: pdf_document
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    echo = TRUE,
+    message = FALSE,
+    warning = FALSE
+)
+```
 
-\section{Abstract}
+\section{Introduction}
 Cricket is one of the most popular and played sports in India. There are three standard types of cricket matches, Five-day match (Test Match), 50 overs match (One day match), and Twenty overs match (T20). Although all formats are quite popular but during the last decade, the popularity of the T20 matches has increased exponentially. The main reason for the popularity of T20 matches is more action in short time. The introduction of various T20 tournaments has also added to its popularity. Indian Premier League (IPL) is the biggest event among all the T20 tournaments across the globe. It is an annual tournament and consists of two stages. In the first or the league stage, each team plays against the other team twice. In the second stage, the top four teams after the league stage compete for the title. We are going to use the IPL data from the year 2008 to 2016. The raw data is available at [Cricsheet website](http://cricsheet.org/downloads/). The raw data consists ball by ball details individually for every match (577 files). The processed data has been downloaded from [Kaggle](https://www.kaggle.com/manasgarg/ipl). For carrying out the analysis we have divided this project into two parts. In the first part, we will further process the data so that it can be used for the next part (visualization and analysis). In the next part, we will develop a shiny application in which the data can be analyzed by plotting and changing various parameters including year, team, and player.
 
 The GitHub repository which I am using for this project is https://github.com/ashishjain1988/STAT585-FinalProject
 
-\section{Introduction}
-
 \section{Dataset}
-As mentioned earlier, the IPL dataset has been available at [Cricsheet website](http://cricsheet.org/downloads/). The raw data consists ball by ball details (including bowler, batsmen, run scored, match, and teams.) individually for every match (577 files). These files also consists the meta information about the match including the the venue, toss winner, match winner, stadium and city. Our aim was first to process the data and make it tidy but this step has already done previously. For our project, we downloaded and used the processed data from [Kaggle](https://www.kaggle.com/manasgarg/ipl). The processed data consists of two files. The first file, `matches.csv` consists of meta-information about all the matches as described earlier as a comma seperated file. The second file, `deliveries.csv` consists of the ball by ball information of the matches. These files have a common identifier called as "match_id" which is the linking key for these two files.
-```
+As mentioned earlier, the IPL dataset has been available at [Cricsheet website](http://cricsheet.org/downloads/). The raw data consists ball by ball details (including bowler, batsmen, run scored, match, and teams.) individually for every match (577 files). These files also consist the meta information about the match including the venue, toss winner, the match winner, stadium, and city. Our aim was first to process the data and make it tidy but this step has already done previously. For our project, we downloaded and used the processed data from [Kaggle](https://www.kaggle.com/manasgarg/ipl). The processed data consists of two files. The first file, `matches.csv` consists of meta-information about all the matches as described earlier as a comma separated file. The second file, `deliveries.csv` consists of the ball by ball information of the matches. These files have a common identifier called as "match_id" which is the linking key for these two files.
+```{r}
+library(ggplot2)
+library(dplyr)
 library(tidyr)
 library(plotly)
+library(ggvis)
 library(ggmap)
 library(rworldmap)
-matches <- read.csv("../data/matches.csv", stringsAsFactors = FALSE)
-ballbyball <- read.csv("../data/deliveries1.csv", stringsAsFactors = FALSE)
+library(ggrepel)
+matches <- read.csv("https://raw.githubusercontent.com/ashishjain1988/STAT585-FinalProject/master/data/matches.csv", stringsAsFactors = FALSE)
+ballbyball <- read.csv("https://raw.githubusercontent.com/ashishjain1988/STAT585-FinalProject/master/data/deliveries1.csv", stringsAsFactors = FALSE)
+location<-read.csv("https://raw.githubusercontent.com/ashishjain1988/STAT585-FinalProject/master/data/location_mapping.csv", stringsAsFactors = FALSE,row.names = 1,header = T)
+location[,"city"]<-row.names(location)
 ```
 
 \section{Methods}
 
 \subsection{Processing of the dataset}
-Although, we downloaded the processed data from [Kaggle](https://www.kaggle.com/manasgarg/ipl), there is still processing we need to do before using the dataset. In our analysis, we want to point each venue of the matches on a world map with the number of matches for a particular team. For this visualization, we need to extract the longitude and latitude for the venues. For this, we used the `ggmap` and `rworldmap` to extract the details. In total, the matches was hosted by 30 different venues across all seasons. By using `ggmap` we extracted the location information and stored in the `location_mapping.csv` file which is under the data folder.
+Although we downloaded the processed data from [Kaggle](https://www.kaggle.com/manasgarg/ipl), there is still processing we need to do before using the dataset. In our analysis, we want to point each venue of the matches on a world map with the number of matches for a particular team. For this visualization, we need to extract the longitude and latitude for the venues. For this, we used the `ggmap` and `rworldmap` to extract the details. In total, the matches were hosted by 30 different venues across all seasons. By using `ggmap` we extracted the location information and stored in the `location_mapping.csv` the file which is in the data folder.
 
 ```
 cities<-unlist(matches %>% distinct(city) %>% filter(city != ""))
@@ -56,44 +67,87 @@ write.csv(points,"../data/location_mapping.csv")
 ```
 
 \section{Results}
-In this section, we will discuss about different features of the developed shiny application and its interactivity. The shiny application has three different tabs which is based on the visulization of data based on IPL season, Team, and Player.
+In this section, we will discuss different features of the developed shiny application and its interactivity. The shiny application has three different tabs which are based on the visualization of data based on IPL season, Team, and Player.
 
 \subsection{IPL seasons analysis}
-In this section, the user can visualize and analyze the data grouped together by the season. The user can use various plots which are described below for a specific season by selecting the season in the select widget. In addition to that, the user can also filter the teams or players by selecting the minimum number of seasons played through the sliderbar. Now we talk about the different plots that are there in the shiny application.
+In this section, the user can visualize and analyze the data grouped together by the season. The user can use various plots which are described below for a specific season by selecting the season in the select widget. In addition to that, the user can also filter the teams or players by selecting the minimum number of seasons played through the slider bar. Now we talk about the different plots that are there in the shiny application.
 
 \subsubsection{Toss Winner}
-This plot compares the count of toss and match winner across different teams in a season. The information is displayed as a histogram. This plot can be used to see the effect of winning the toss on the match result for teams. The user can also hovers over the bars and get the details. For example,<One plot for this>
+This plot compares the count of toss and matches winner across different teams in a season. The information is displayed as a histogram. This plot can be used to see the effect of winning the toss on the match result for teams. The user can also hover over the bars and get the details. For example,<One plot for this>
+
+```{r}
+Toss<-matches %>% filter(season == 2008) %>% group_by(toss_winner) %>% count() %>% mutate(winner = toss_winner) %>% select(-toss_winner)
+Match<-matches %>% filter(season == 2008,toss_winner == winner) %>% group_by(winner) %>% filter(winner != "") %>%count()
+Toss$name<-"1. Toss"
+Match$name<-"2. Match"
+team_seasons<-matches %>% gather(key=team,value=teamname,c(5:6)) %>% distinct(season,teamname) %>% group_by(teamname) %>% count() %>% filter(n>=1)
+stat_data_toss<-rbind(Toss,Match) %>% filter(winner %in% team_seasons$teamname)
+gg<-ggplot(stat_data_toss, aes(winner,n, fill = name)) + geom_histogram(position = "dodge",stat = "identity") +
+      ggtitle(paste("Number of tosses and matches won by the teams in", 2008, "season and played at least",1,"seasons")) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Teams") + ylab("#Matches")
+gg
+```
 
 \subsubsection{Comparison of total matches played and won}
-This plot compares the total matchs played and total match won across different teams in a season. The information is displayed as a histogram. This plot can be used to check the performace of the teams in a season. This will also tells us the winner of a particular season. The user can also hovers over the bars and get the details. For example,<One plot for this>
+This plot compares the total matches played and total match won across different teams in a season. The information is displayed as a histogram. This plot can be used to check the performance of the teams in a season. This will also tell us the winner of a particular season. The user can also hover over the bars and get the details.
 
 \subsubsection{Comparison of average runs scored by teams}
-This plot compares the average runs scored across different teams in a season. The information is displayed as a boxplot. This plot can be used to check the performace of the teams in a season by displaying their batting performance of the teams in a season. The user can also hovers over the bars and get the details about the mean, outlier scores, upper and lower quartile. For example,<One plot for this>
+This plot compares the average runs scored across different teams in a season. The information is displayed as a boxplot. This plot can be used to check the performance of the teams in a season by displaying their batting performance of the teams in a season. The user can also hover over the bars and get the details about the mean, outlier scores, upper and lower quartile.
 
 \subsubsection{Top batsmen}
-This plot compares the total runs scored by batsmen in a season. The information is displayed as a histogram. This plot shows the top 10 batsmen in a season based on the number of runs scored. The number of runs scored by the batsmen are displayed above the plot. For example,<One plot for this>
+This plot compares the total runs scored by batsmen in a season. The information is displayed as a histogram. This plot shows the top 10 batsmen in a season based on the number of runs scored. The number of runs scored by the batsmen is displayed above the plot.
 
 \subsubsection{Top Bowler}
-This plot compares the total runs scored by batsmen in a season. The information is displayed as a histogram. This plot shows the top 10 batsmen in a season based on the number of runs scored. The number of runs scored by the batsmen are displayed above the plot. For example,<One plot for this>
+This plot compares the total runs scored by batsmen in a season. The information is displayed as a histogram. This plot shows the top 10 batsmen in a season based on the number of runs scored. The number of runs scored by the batsmen is displayed above the plot.
 
 \subsection{Team performance Analysis}
-In this section, the user can visualize and analyze the data grouped together for a team across all seasons. The user can use various plots which are described below for a team by selecting the team in the select widget. In addition to that, the user can also filter the teams by selecting the minimum number of seasons played through the sliderbar (Automatic updation of team select widget). Now we talk about the different plots that are there for this.
+In this section, the user can visualize and analyze the data grouped together for a team across all seasons. The user can use various plots which are described below for a team by selecting the team in the select widget. In addition to that, the user can also filter the teams by selecting the minimum number of seasons played through the slider bar (Automatic update of team select widget). Now we talk about the different plots that are there for this.
 
 \subsubsection{Comparison of total matches played and won}
-This plot compares the total matchs played and total match won by a team across the seasons. The information is displayed as a histogram. This plot can be used to check the performace of a team across different seasons. The user can also hovers over the bars and get the details. For example,<One plot for this>
+This plot compares the total matches played and total match won by a team across the seasons. The information is displayed as a histogram. This plot can be used to check the performance of a team across different seasons. The user can also hover over the bars and get the details.
 
 \subsubsection{Comparison of average runs scored}
-This plot compares the average runs scored by a team across the seasons. The information is displayed as a boxplot. This plot can be used to check the performace of a team by checking their batting performance across the seasons. The user can also hovers over the bars and get the details about the mean, outlier scores, upper and lower quartile. For example,<One plot for this>
+This plot compares the average runs scored by a team across the seasons. The information is displayed as a boxplot. This plot can be used to check the performance of a team by checking their batting performance across the seasons. The user can also hover over the bars and get the details about the mean, outlier scores, upper and lower quartile.
 
-\subsubsection{Venue Details}
+\subsubsection{Location Details}
+This plot contains the information about the matches won by a team at a particular venue. The information is displayed by using `ggmap`. The plot maps the location of the venue by plotting the longitude and latitude on a world map and labeling the number of matches played and won at that location. For example the plot below show the location where Gujrat Lions played. The labels consists of the venue name, number of matches played and won.
+```
+teamName<-"Gujarat Lions"
+matchPlayed <- matches %>% gather(key=team,value=teamname,c(5:6)) %>% filter(teamname == teamName) %>% select(teamname,city) %>% group_by(city) %>% count()
+matchWon <- matches %>% filter(winner == teamName) %>% select(winner,city) %>%group_by(city) %>% count()
+names(matchPlayed)<-c("city","Matches.Played")
+df<-data.frame(setdiff(matchPlayed$city,matchWon$city),0)
+names(df)<-c("city","n")
+dd<-rbind(matchWon,df)
+names(dd)<-c("city","Matches.Won")
+matchl<-merge(matchPlayed,dd,by.x="city",by.y="city")
+matchlocation<-merge(matchl,location,by.x="city",by.y="city")
+map <- get_map(location = unique(matchlocation$V3), zoom = 4)
+ggmap(map) + geom_point(data = matchlocation,aes(x=lon,y=lat)) +
+  geom_label_repel(data = matchlocation,aes(lon, lat, label = paste(city,Matches.Played,Matches.Won)),fontface = 'bold', color = 'red',box.padding = unit(0.35, "lines"),point.padding = unit(0.5, "lines"),segment.color = 'grey50') +
+  theme_classic(base_size = 10)
+```
+
 
 \subsection{Player's performance analysis}
-In this section, the user can visualize and analyze the data grouped for a player across all seasons. The user can use various plots which are described below for a player to analyze his performace by selecting the player in the select widget. In addition to that, the user can also filter the players by selecting the minimum number of seasons played through the sliderbar (Automatic updation of player select widget).
+In this section, the user can visualize and analyze the data grouped for a player across all seasons. The user can use various plots which are described below for a player to analyze his performance by selecting the player in the select widget. In addition to that, the user can also filter the players by selecting the minimum number of seasons played through the slider bar (Automatic update of the player select widget).
+
+\subsubsection{Average runs scored across seasons}
+This plot compares the average runs scored by a batsman across seasons. The information is displayed as a boxplot. This plot can be used to check the performance of a batsman by checking his batting performance across the seasons. The user can also hover over the bars and get the details about the mean, highest score, upper and lower quartile. For example, the plot below shows the average runs of Virat Kohli across all seasons.
+
+```{r}
+player<-"V Kohli"
+runs_by_season<-ballbyball %>% filter(player == batsman) %>% group_by(Season,match_id) %>% summarise(totalscore = sum(batsman_runs))
+ggplot(runs_by_season, aes(x=Season, y = totalscore,fill = factor(Season))) + geom_boxplot() +
+      ggtitle(paste("Total Runs for", player, "across all seasons")) +
+        xlab("Season") + ylab("#Runs")
+```
 
 \subsubsection{Player of match awards}
-\subsubsection{Average runs scored across seasons}
-\subsubsection{Total Wickets}
+This plot compares the player of the match award by a player across the seasons. The information is displayed as a histogram. This plot can be used to check the impact of the player in a particular season. For example,<One plot for this>
 
-\section{Discussion}
+\subsubsection{Total Wickets}
+This plot compares the number of wickets taken by a bowler across seasons. This plot can be used to check the performance of the bowler by checking his bowling performance across the seasons. The user can also hover over the points and get the information about the number of wickets in a particular season. For example,<One plot for this>
 
 \section{Future Work}
+TBD
