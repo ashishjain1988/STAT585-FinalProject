@@ -6,24 +6,35 @@ author: "Ashish Jain"
 output: pdf_document
 ---
 
-##Abstract
-Cricket is one of the most popular and played sports in India. There are three standard types of cricket matches, Five-day match (Test Match), 50 overs match (One day match), and Twenty overs match (T20). Although all formats are quite popular but during the last decade, the popularity of the T20 matches has increased exponentially. The main reason for the popularity of T20 matches is more action in short time. The introduction of various T20 tournaments has also added to its popularity. Indian Premier League (IPL) is the biggest event among all the T20 tournaments across the globe. It is an annual tournament and consists of two stages. In the first or the league stage, each team plays against the other team twice. In the second stage, the top four teams after the league stage compete for the title. We are going to use the IPL data from the year 2008 to 2016. The raw data has been downloaded from [Cricsheet website](http://cricsheet.org/downloads/). The raw data consists ball by ball details individually for every match (577 files). The CSV file also has a summary of the match. For carrying out the analysis we have divided this project into two parts. In the first part, we will clean and format (tidy form) the data so that it can be used for the next part (visualization and analysis). In the next part, we will develop a shiny application in which the data can be analyzed by plotting and changing various parameters including year, team, and player.
+\section{Abstract}
+Cricket is one of the most popular and played sports in India. There are three standard types of cricket matches, Five-day match (Test Match), 50 overs match (One day match), and Twenty overs match (T20). Although all formats are quite popular but during the last decade, the popularity of the T20 matches has increased exponentially. The main reason for the popularity of T20 matches is more action in short time. The introduction of various T20 tournaments has also added to its popularity. Indian Premier League (IPL) is the biggest event among all the T20 tournaments across the globe. It is an annual tournament and consists of two stages. In the first or the league stage, each team plays against the other team twice. In the second stage, the top four teams after the league stage compete for the title. We are going to use the IPL data from the year 2008 to 2016. The raw data is available at [Cricsheet website](http://cricsheet.org/downloads/). The raw data consists ball by ball details individually for every match (577 files). The processed data has been downloaded from [Kaggle](https://www.kaggle.com/manasgarg/ipl). For carrying out the analysis we have divided this project into two parts. In the first part, we will further process the data so that it can be used for the next part (visualization and analysis). In the next part, we will develop a shiny application in which the data can be analyzed by plotting and changing various parameters including year, team, and player.
 
 The GitHub repository which I am using for this project is https://github.com/ashishjain1988/STAT585-FinalProject
 
-##1. Introduction
+\section{Introduction}
 
-##2. Methods
-
-##2.1 Processing of the dataset
+\section{Dataset}
+As mentioned in the earlier section, the IPL dataset has been available at [Cricsheet website](http://cricsheet.org/downloads/). The raw data consists ball by ball details (including bowler, batsmen, run scored, match, and teams.) individually for every match (577 files). These files also consists the meta information about the match including the the venue, toss winner, match winner, stadium and city. Our aim was first to process the data and make it tidy but this step has already done previously. For our project, we downloaded and used the processed data from [Kaggle](https://www.kaggle.com/manasgarg/ipl). The processed data consists of two files. The first file, `matches.csv` consists of meta-information about all the matches as described earlier as a comma seperated file. The second file, `deliveries.csv` consists of the ball by ball information of the matches. These files have a common identifier called as "match_id" which is the linking key for these two files.
 ```
+library(tidyr)
+library(plotly)
 library(ggmap)
 library(rworldmap)
+matches <- read.csv("../data/matches.csv", stringsAsFactors = FALSE)
+ballbyball <- read.csv("../data/deliveries1.csv", stringsAsFactors = FALSE)
+```
+
+\section{Methods}
+
+\subsection{Processing of the dataset}
+Although, we downloaded the processed data from [Kaggle](https://www.kaggle.com/manasgarg/ipl), there is still processing we need to do before using the dataset. In our analysis, we want to point each venue of the matches on a world map with the number of matches for a particular team. For this visualization, we need to extract the longitude and latitude for the venues. For this, we used the `ggmap` and `rworldmap` to extract the details. In total, the matches was hosted by 30 different venues across all seasons. By using `ggmap` we extracted the location information and stored in the `location_mapping.csv` file which is under the data folder.
+
+```
 cities<-unlist(matches %>% distinct(city) %>% filter(city != ""))
 points<-geocode(cities)
 row.names(points)<-cities
 points<-points[,2:3]
-coords2 <- function(points)
+coord2loc <- function(points)
 {
   countriesSP <- getMap(resolution='low')
   pointsSP = SpatialPoints(points, proj4string=CRS(proj4string(countriesSP)))  
@@ -33,7 +44,7 @@ coords2 <- function(points)
   indices$ADMIN  #returns country name
   #indices$ISO3 # returns the ISO3 code 
 }
-countries<-coords2(as.matrix(points))
+countries<-coord2loc(as.matrix(points))
 points[,3]<-countries
 points["Kochi",]$V3<-"India"
 write.csv(points,"../data/location_mapping.csv")
@@ -43,10 +54,12 @@ write.csv(points,"../data/location_mapping.csv")
 #mp <- ggplot() +   mapWorld
 #mp <- mp+ geom_point(aes(x=visit.x, y=visit.y) ,color="blue", size=3)
 ```
-##3 Results
-##3.1 Analysis of data across seasons
-####3.1.1 Toss Winner
-####3.1.2 Comparison of total matches played and won
+
+\section{Results}
+In this section, we will talk about the 
+\subsection{Analysis of data across seasons}
+\subsubsection{Toss Winner}
+\subsubsection{Comparison of total matches played and won}
 ####3.1.3 Comparison of average runs scored by teams 
 ####3.1.4 Top batsmen
 ####3.1.5 Top Bowler
@@ -60,6 +73,8 @@ write.csv(points,"../data/location_mapping.csv")
 ####3.3.2 Average runs scored across seasons
 ####3.3.3 Total Wickets
 
-##4 Conclusions
+\subsection{Shiny Application}
 
+\section{Outcomes}
 
+\section{Future Work}
