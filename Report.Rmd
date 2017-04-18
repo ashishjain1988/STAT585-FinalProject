@@ -20,7 +20,7 @@ The GitHub repository which I am using for this project is https://github.com/as
 
 \section{Dataset}
 As mentioned earlier, the IPL dataset has been available at [Cricsheet website](http://cricsheet.org/downloads/). The raw data consists ball by ball details (including bowler, batsmen, run scored, match, and teams.) individually for every match (577 files). These files also consist the meta information about the match including the venue, toss winner, the match winner, stadium, and city. Our aim was first to process the data and make it tidy but this step has already done previously. For our project, we downloaded and used the processed data from [Kaggle](https://www.kaggle.com/manasgarg/ipl). The processed data consists of two files. The first file, `matches.csv` consists of meta-information about all the matches as described earlier as a comma separated file. The second file, `deliveries.csv` consists of the ball by ball information of the matches. These files have a common identifier called as "match_id" which is the linking key for these two files.
-```{r}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 library(ggplot2)
 library(dplyr)
 library(tidyr)
@@ -29,9 +29,10 @@ library(ggvis)
 library(ggmap)
 library(rworldmap)
 library(ggrepel)
-matches <- read.csv("https://raw.githubusercontent.com/ashishjain1988/STAT585-FinalProject/master/data/matches.csv", stringsAsFactors = FALSE)
-ballbyball <- read.csv("https://raw.githubusercontent.com/ashishjain1988/STAT585-FinalProject/master/data/deliveries1.csv", stringsAsFactors = FALSE)
-location<-read.csv("https://raw.githubusercontent.com/ashishjain1988/STAT585-FinalProject/master/data/location_mapping.csv", stringsAsFactors = FALSE,row.names = 1,header = T)
+github<-"https://raw.githubusercontent.com/ashishjain1988/STAT585-FinalProject/master/data/"
+matches <- read.csv(paste0(github,"matches.csv"), stringsAsFactors = FALSE)
+ballbyball <- read.csv(paste0(github,"deliveries1.csv"), stringsAsFactors = FALSE)
+location<-read.csv(paste0(github,"location_mapping.csv"), stringsAsFactors = FALSE, row.names = 1,header = T)
 location[,"city"]<-row.names(location)
 ```
 
@@ -75,7 +76,7 @@ In this section, the user can visualize and analyze the data grouped together by
 \subsubsection{Toss Winner}
 This plot compares the count of toss and matches winner across different teams in a season. The information is displayed as a histogram. This plot can be used to see the effect of winning the toss on the match result for teams. The user can also hover over the bars and get the details. For example,<One plot for this>
 
-```{r}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 Toss<-matches %>% filter(season == 2008) %>% group_by(toss_winner) %>% count() %>% mutate(winner = toss_winner) %>% select(-toss_winner)
 Match<-matches %>% filter(season == 2008,toss_winner == winner) %>% group_by(winner) %>% filter(winner != "") %>%count()
 Toss$name<-"1. Toss"
@@ -113,8 +114,10 @@ This plot compares the average runs scored by a team across the seasons. The inf
 This plot contains the information about the matches won by a team at a particular venue. The information is displayed by using `ggmap`. The plot maps the location of the venue by plotting the longitude and latitude on a world map and labeling the number of matches played and won at that location. For example the plot below show the location where Gujrat Lions played. The labels consists of the venue name, number of matches played and won.
 ```
 teamName<-"Gujarat Lions"
-matchPlayed <- matches %>% gather(key=team,value=teamname,c(5:6)) %>% filter(teamname == teamName) %>% select(teamname,city) %>% group_by(city) %>% count()
-matchWon <- matches %>% filter(winner == teamName) %>% select(winner,city) %>%group_by(city) %>% count()
+matchPlayed <- matches %>% gather(key=team,value=teamname,c(5:6)) %>% filter(teamname == teamName) 
+%>% select(teamname,city) %>% group_by(city) %>% count()
+matchWon <- matches %>% filter(winner == teamName) %>% select(winner,city) %>%group_by(city) 
+%>% count()
 names(matchPlayed)<-c("city","Matches.Played")
 df<-data.frame(setdiff(matchPlayed$city,matchWon$city),0)
 names(df)<-c("city","n")
@@ -124,10 +127,11 @@ matchl<-merge(matchPlayed,dd,by.x="city",by.y="city")
 matchlocation<-merge(matchl,location,by.x="city",by.y="city")
 map <- get_map(location = unique(matchlocation$V3), zoom = 4)
 ggmap(map) + geom_point(data = matchlocation,aes(x=lon,y=lat)) +
-  geom_label_repel(data = matchlocation,aes(lon, lat, label = paste(city,Matches.Played,Matches.Won)),fontface = 'bold', color = 'red',box.padding = unit(0.35, "lines"),point.padding = unit(0.5, "lines"),segment.color = 'grey50') +
+  geom_label_repel(data = matchlocation,aes(lon, lat, label = paste(city,Matches.Played,Matches.Won)),
+  fontface = 'bold', color = 'red',box.padding = unit(0.35, "lines"),point.padding = unit(0.5, "lines"),segment.color = 'grey50') +
   theme_classic(base_size = 10)
 ```
-
+![Locations of Gujarat Lions](https://raw.githubusercontent.com/ashishjain1988/STAT585-FinalProject/master/GL-Matchesdetails.png)
 
 \subsection{Player's performance analysis}
 In this section, the user can visualize and analyze the data grouped for a player across all seasons. The user can use various plots which are described below for a player to analyze his performance by selecting the player in the select widget. In addition to that, the user can also filter the players by selecting the minimum number of seasons played through the slider bar (Automatic update of the player select widget).
@@ -144,10 +148,10 @@ ggplot(runs_by_season, aes(x=Season, y = totalscore,fill = factor(Season))) + ge
 ```
 
 \subsubsection{Player of match awards}
-This plot compares the player of the match award by a player across the seasons. The information is displayed as a histogram. This plot can be used to check the impact of the player in a particular season. For example,<One plot for this>
+This plot compares the player of the match award by a player across the seasons. The information is displayed as a histogram. This plot can be used to check the impact of the player in a particular season.
 
 \subsubsection{Total Wickets}
-This plot compares the number of wickets taken by a bowler across seasons. This plot can be used to check the performance of the bowler by checking his bowling performance across the seasons. The user can also hover over the points and get the information about the number of wickets in a particular season. For example,<One plot for this>
+This plot compares the number of wickets taken by a bowler across seasons. This plot can be used to check the performance of the bowler by checking his bowling performance across the seasons. The user can also hover over the points and get the information about the number of wickets in a particular season.
 
 \section{Future Work}
 TBD
