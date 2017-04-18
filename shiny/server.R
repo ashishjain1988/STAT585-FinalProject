@@ -99,7 +99,7 @@ shinyServer(function(input, output,session) {
   })
   output$stat_topbatsmen <- renderPlotly({
     gg<-ggplot(data = stat_data_topbatsmen()) + geom_histogram(aes(x=batsman,y=Total.Runs,fill = batsman),stat = "identity") + geom_text(aes(x=batsman,y=Total.Runs+50,label=Total.Runs)) +
-      ggtitle(paste("Top Batsmen in ", input$team_year,"season")) +
+      ggtitle(paste("Top Batsmen in", input$team_year,"season")) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Batsman name") + ylab("#Total Runs")
     plotly::ggplotly(gg)
   })
@@ -116,7 +116,7 @@ shinyServer(function(input, output,session) {
   })
   output$stat_topbowler <- renderPlotly({
     gg<-ggplot(data = stat_data_topbowler()) + geom_histogram(aes(x=bowler,y=n,fill = bowler),stat = "identity") + geom_text(aes(x=bowler,y=n+3,label=n)) +
-      ggtitle(paste("Top Bowler in ", input$team_year,"season")) +
+      ggtitle(paste("Top Bowler in", input$team_year,"season")) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Bowler name") + ylab("#Wickets")
     plotly::ggplotly(gg)
   })
@@ -132,7 +132,7 @@ shinyServer(function(input, output,session) {
   })
   output$stat_topplayer <- renderPlotly({
     gg<-ggplot(data = stat_data_topplayer()) + geom_histogram(aes(x=player_of_match,y=n,fill = player_of_match),stat = "identity") + geom_text(aes(x=player_of_match,y=n+0.25,label=n)) +
-      ggtitle(paste("Top Player of the match in ", input$team_year,"season")) +
+      ggtitle(paste("Top Player of the match in", input$team_year,"season")) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Player name") + ylab("#Player of the Match")
     plotly::ggplotly(gg)
   })
@@ -173,7 +173,7 @@ shinyServer(function(input, output,session) {
 
   output$team_tosswinner <- renderPlotly({
     gg<-ggplot(team_data_tosswon(), aes(season,n, fill = name)) + geom_histogram(position = "dodge",stat = "identity") +
-      ggtitle(paste("Number of Tosses won by ", input$team_team, "across all seasons")) +
+      ggtitle(paste("Number of Tosses won by", input$team_team, "across all seasons")) +
        xlab("Teams") + ylab("#Toss Won")
     plotly::ggplotly(gg)
   })
@@ -183,7 +183,7 @@ shinyServer(function(input, output,session) {
   })
   output$team_avgteamruns <- renderPlotly({
     gg<-ggplot(team_data_avgteamruns(), aes(x=Season, y = totalscore,fill = factor(Season))) + geom_boxplot() +
-      ggtitle(paste("Number of tosses won by the teams in ", input$team_year,"season")) +
+      ggtitle(paste("Number of tosses won by the teams in", input$team_year,"season")) +
       xlab("Season") + ylab("#Total Score")
     plotly::ggplotly(gg)
   })
@@ -295,25 +295,25 @@ shinyServer(function(input, output,session) {
     if(input$typeOfChart == "Player of the match")
     {
       gg<-ggplot(data = player_data_matchplayer(), aes(season,fill = factor(season))) + geom_bar() +
-        ggtitle(paste("Number of player of the match for ", input$player_name, "across all seasons")) +
+        ggtitle(paste("Number of player of the match for", input$player_name, "across all seasons")) +
         xlab("Season") + ylab("#Player of Match Won")
       plotly::ggplotly(gg)
     }else if(input$typeOfChart == "Runs by season")
     {
       gg<-ggplot(player_data_runsbyseason(), aes(x=Season, y = totalscore,fill = factor(Season))) + geom_boxplot() +
-      ggtitle(paste("Total Runs for ", input$player_name, "across all seasons")) +
+      ggtitle(paste("Total Runs for", input$player_name, "across all seasons")) +
         xlab("Season") + ylab("#Runs")
       plotly::ggplotly(gg)
     }else if(input$typeOfChart == "Wickets by season")
     {
       gg<-ggplot(data = player_data_wicketsbyseason(),aes(x=Season,y=n)) + geom_point(aes(color=factor(Season))) + geom_line() +
-      ggtitle(paste("Total wickets for ", input$player_name, "across all seasons")) +
+      ggtitle(paste("Total wickets for", input$player_name, "across all seasons")) +
         theme(axis.text.x = element_text(angle = 60, hjust = 1)) + xlab("Season") + ylab("#Wickets")
       plotly::ggplotly(gg)
     }else
     {
       gg<-ggplot(data = player_data_wicketsbyseason(),aes(x=Season,y=n)) + geom_point() + geom_line() +
-        ggtitle(paste("Total wickets for ", input$player_name, "across all seasons")) +
+        ggtitle(paste("Total wickets for", input$player_name,"across all seasons")) +
         theme(axis.text.x = element_text(angle = 60, hjust = 1)) + xlab("Season") + ylab("#Wickets")
       plotly::ggplotly(gg)
     }
