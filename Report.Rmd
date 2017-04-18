@@ -1,6 +1,6 @@
 ---
 title: "Indian Premier League (IPL) data analysis"
-subtitle: 'STAT585 Final Project'
+subtitle: 'STAT585 Final Project Report'
 date: "`r format(Sys.time(), '%d %B %Y')`"
 author: "Ashish Jain"
 output: pdf_document
@@ -80,7 +80,11 @@ This plot compares the total runs scored by batsmen in a season. The information
 In this section, the user can visualize and analyze the data grouped together for a team across all seasons. The user can use various plots which are described below for a team by selecting the team in the select widget. In addition to that, the user can also filter the teams by selecting the minimum number of seasons played through the sliderbar (Automatic updation of team select widget). Now we talk about the different plots that are there for this.
 
 \subsubsection{Comparison of total matches played and won}
+This plot compares the total matchs played and total match won by a team across the seasons. The information is displayed as a histogram. This plot can be used to check the performace of a team across different seasons. The user can also hovers over the bars and get the details. For example,<One plot for this>
+
 \subsubsection{Comparison of average runs scored}
+This plot compares the average runs scored by a team across the seasons. The information is displayed as a boxplot. This plot can be used to check the performace of a team by checking their batting performance across the seasons. The user can also hovers over the bars and get the details about the mean, outlier scores, upper and lower quartile. For example,<One plot for this>
+
 \subsubsection{Venue Details}
 
 \subsection{Player's performance analysis}
