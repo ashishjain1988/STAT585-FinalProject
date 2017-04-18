@@ -51,7 +51,7 @@ shinyUI(navbarPage("T20 Cricket - Indian Premier League (IPL)",
                               tabsetPanel(
                                 tabPanel("Toss Winner",plotlyOutput("team_tosswinner")),
                                 tabPanel("Average Runs across seasons",plotlyOutput("team_avgteamruns")),
-                                tabPanel("Locations of Matches",plotOutput("team_locations"))
+                                tabPanel("Locations of Matches",plotOutput("team_locations"),width = "80%")
                                 #tabPanel("Toss Decision",plotlyOutput("tossdecision")),
                                 #tabPanel("Winning Percentage",plotlyOutput("winningpercentage"))
                               )

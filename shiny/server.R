@@ -14,12 +14,6 @@ ballbyball <- read.csv("../data/deliveries1.csv", stringsAsFactors = FALSE)
 #dataset<-merge(matches,ballbyball,by.x="id",by.y="match_id")
 location<-read.csv("../data/location_mapping.csv", stringsAsFactors = FALSE,row.names = 1,header = T)
 location[,"city"]<-row.names(location)
-#ballbyball %>% mutate(season = matches[matches$id == match_id,]$season)
-#for(i in 1:nrow(ballbyball))
-#{
-#  print(i)
-#  ballbyball[i,]$season<-matches[matches$id == ballbyball[i,]$match_id,]$season
-#}
 
 shinyServer(function(input, output,session) {
 
@@ -27,7 +21,7 @@ shinyServer(function(input, output,session) {
     if(input$team_year != "All")
     {
       Toss<-matches %>% filter(season == input$team_year) %>% group_by(toss_winner) %>% count() %>% mutate(winner = toss_winner) %>% select(-toss_winner)
-      Match<-matches %>% filter(season == input$team_year) %>% group_by(winner) %>% filter(winner != "") %>%count()
+      Match<-matches %>% filter(season == input$team_year,toss_winner == winner) %>% group_by(winner) %>% filter(winner != "") %>%count()
     }else
     {
       Toss<-matches %>% group_by(toss_winner) %>% count() %>% mutate(winner = toss_winner) %>% select(-toss_winner)
@@ -36,12 +30,12 @@ shinyServer(function(input, output,session) {
     Toss$name<-"Toss"
     Match$name<-"Match"
     team_seasons<-matches %>% gather(key=team,value=teamname,c(5:6)) %>% distinct(season,teamname) %>% group_by(teamname) %>% count() %>% filter(n>=input$team_range)
-    return(rbind(Match,Toss) %>% filter(winner %in% team_seasons$teamname))
+    return(rbind(Toss,Match) %>% filter(winner %in% team_seasons$teamname))
 
   })
   output$stat_tossdecision <- renderPlotly({
     gg<-ggplot(stat_data_tosswon(), aes(winner,n, fill = name)) + geom_histogram(position = "dodge",stat = "identity") +
-      ggtitle(paste("Number of tosses won by the teams in", input$team_year, "season and played at least",input$team_range,"seasons")) +
+      ggtitle(paste("Number of tosses and matches won by the teams in", input$team_year, "season and played at least",input$team_range,"seasons")) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Teams") + ylab("#Matches")
     plotly::ggplotly(gg)
   })
@@ -79,7 +73,7 @@ shinyServer(function(input, output,session) {
     winner$name<-"Winner"
     total$name<-"Total Played"
     team_seasons<-matches %>% gather(key=team,value=teamname,c(5:6)) %>% distinct(season,teamname) %>% group_by(teamname) %>% count() %>% filter(n>=input$team_range)
-    return(rbind(winner,total) %>% filter(teamname %in% team_seasons$teamname))
+    return(rbind(total,winner) %>% filter(teamname %in% team_seasons$teamname))
   })
   output$stat_matchesPlayed <- renderPlotly({
     gg<-ggplot(stat_data_matchesPlayed(), aes(teamname,n, fill = name)) + geom_histogram(position = "dodge",stat = "identity") +
@@ -165,10 +159,10 @@ shinyServer(function(input, output,session) {
 
   team_data_tosswon <- reactive({
     Toss<-matches %>% filter(input$team_team == toss_winner) %>% group_by(season) %>% count()
-    Match<-matches %>% filter(input$team_team == winner) %>% group_by(season) %>% filter(winner != "") %>%count()
+    Match<-matches %>% filter(input$team_team == winner,toss_winner == winner) %>% group_by(season) %>% filter(winner != "") %>%count()
     Toss$name<-"Toss"
     Match$name<-"Match"
-    return(rbind(Match,Toss))
+    return(rbind(Toss,Match))
 
   })
 
@@ -190,29 +184,38 @@ shinyServer(function(input, output,session) {
   })
 
   team_data_locationcount <- reactive({
-    matchl <- matches %>% gather(key=team,value=teamname,c(5:6)) %>% filter(teamname == input$team_team) %>% select(teamname,city) %>%group_by(city) %>% count()
+    matchPlayed <- matches %>% gather(key=team,value=teamname,c(5:6)) %>% filter(teamname == input$team_team) %>% select(teamname,city) %>%group_by(city) %>% count()
+    matchWon <- matches %>% filter(winner == input$team_team) %>% select(winner,city) %>%group_by(city) %>% count()
+    names(matchPlayed)<-c("city","Matches.Played")
+    df<-data.frame(setdiff(matchPlayed$city,matchWon$city),0)
+    names(df)<-c("city","n")
+    dd<-rbind(matchWon,df)
+    names(dd)<-c("city","Matches.Won")
+    matchl<-merge(matchPlayed,dd,by.x="city",by.y="city")
     matchlocation<-merge(matchl,location,by.x="city",by.y="city")
-    row.names(matchlocation)<-matchlocation$city
     return(matchlocation)
   })
   output$team_locations <- renderPlot({
-    matchlocation<-team_data_locationcount()
     if(length(unique(team_data_locationcount()$V3)) > 1)
     {
-      mp<-NULL
-      mapWorld <- borders("world", colour="gray50", fill="gray50")
-      mp<- ggplot(data = team_data_locationcount()) + mapWorld
-      mp <- mp + geom_point(aes(x=lon, y=lat),color="blue", size=3) +
-        geom_label_repel(aes(lon, lat, label = city),fontface = 'bold', color = 'red',box.padding = unit(0.35, "lines"),point.padding = unit(0.5, "lines"),segment.color = 'black') +
-        theme_classic(base_size = 10)
-      mp
+      # mp<-NULL
+      # mapWorld <- borders("world", colour="gray50", fill="gray50")
+      # mp<- ggplot(data = team_data_locationcount()) + mapWorld
+      # mp <- mp + geom_point(aes(x=lon, y=lat),color="blue", size=3) +
+      #   geom_label_repel(aes(lon, lat, label = city),fontface = 'bold', color = 'red',box.padding = unit(0.35, "lines"),point.padding = unit(0.5, "lines"),segment.color = 'black') +
+      #   theme_classic(base_size = 10)
+      # mp
+        location<-"Asia"
+        zoom <- 2
     }else
     {
-      map <- get_map(location = unique(team_data_locationcount()$V3), zoom = 4)
-      ggmap(map) + geom_point(data = team_data_locationcount(),aes(x=lon,y=lat)) +
-        geom_label_repel(data = team_data_locationcount(),aes(lon, lat, label = city),fontface = 'bold', color = 'red',box.padding = unit(0.35, "lines"),point.padding = unit(0.5, "lines"),segment.color = 'grey50') +
-        theme_classic(base_size = 10)
+      location<-unique(team_data_locationcount()$V3)
+      zoom<-4
     }
+    map <- get_map(location = location, zoom = zoom)
+    ggmap(map) + geom_point(data = team_data_locationcount(),aes(x=lon,y=lat)) +
+      geom_label_repel(data = team_data_locationcount(),aes(lon, lat, label = paste(city,Matches.Played,Matches.Won)),fontface = 'bold', color = 'red',box.padding = unit(0.35, "lines"),point.padding = unit(0.5, "lines"),segment.color = 'grey50') +
+      theme_classic(base_size = 10)
 
   })
 
