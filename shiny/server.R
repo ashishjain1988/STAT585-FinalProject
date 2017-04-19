@@ -25,10 +25,10 @@ shinyServer(function(input, output,session) {
     }else
     {
       Toss<-matches %>% group_by(toss_winner) %>% count() %>% mutate(winner = toss_winner) %>% select(-toss_winner)
-      Match<-matches %>% group_by(winner) %>% filter(winner != "") %>%count()
+      Match<-matches %>% filter(toss_winner == winner) %>% group_by(winner) %>% filter(winner != "") %>%count()
     }
-    Toss$name<-"Toss"
-    Match$name<-"Match"
+    Toss$name<-"1. Toss"
+    Match$name<-"2. Match"
     team_seasons<-matches %>% gather(key=team,value=teamname,c(5:6)) %>% distinct(season,teamname) %>% group_by(teamname) %>% count() %>% filter(n>=input$team_range)
     return(rbind(Toss,Match) %>% filter(winner %in% team_seasons$teamname))
 
@@ -70,7 +70,7 @@ shinyServer(function(input, output,session) {
       winner<-matches %>% filter(winner != "") %>% group_by(winner) %>% count() %>% mutate(teamname = winner) %>% select(-winner)
       total<-matches %>% gather(key=team,value=teamname,c(5:6)) %>% group_by(teamname) %>% count()
     }
-    winner$name<-"Winner"
+    winner$name<-"Total Won"
     total$name<-"Total Played"
     team_seasons<-matches %>% gather(key=team,value=teamname,c(5:6)) %>% distinct(season,teamname) %>% group_by(teamname) %>% count() %>% filter(n>=input$team_range)
     return(rbind(total,winner) %>% filter(teamname %in% team_seasons$teamname))
@@ -160,8 +160,8 @@ shinyServer(function(input, output,session) {
   team_data_tosswon <- reactive({
     Toss<-matches %>% filter(input$team_team == toss_winner) %>% group_by(season) %>% count()
     Match<-matches %>% filter(input$team_team == winner,toss_winner == winner) %>% group_by(season) %>% filter(winner != "") %>%count()
-    Toss$name<-"Toss"
-    Match$name<-"Match"
+    Toss$name<-"1. Toss"
+    Match$name<-"2. Match"
     return(rbind(Toss,Match))
 
   })
