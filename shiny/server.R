@@ -303,7 +303,7 @@ shinyServer(function(input, output,session) {
   output$player_matchplayer <- renderPlotly({
     if(input$typeOfChart == "Player of the match")
     {
-      gg<-ggplot(data = player_data_matchplayer(), aes(season,fill = factor(season))) + geom_bar() +
+      gg<-ggplot(data = player_data_matchplayer(), aes(season,fill = factor(season))) + geom_histogram() +
         ggtitle(paste("Number of player of the match for", input$player_name, "across all seasons")) +
         xlab("Season") + ylab("#Player of Match Won")
       plotly::ggplotly(gg)
