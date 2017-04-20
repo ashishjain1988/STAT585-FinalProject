@@ -244,14 +244,14 @@ shinyServer(function(input, output,session) {
       updateSelectInput(session, "player_name",
                                             label = "Player Of Match",
                        choices = players[,1],selected = "V Kohli")
-     }else if(input$typeOfChart == "Runs by season")
+     }else if(input$typeOfChart == "Runs Scored")
      {
        player_seasons<-ballbyball %>% distinct(Season,batsman) %>% group_by(batsman) %>% count() %>% filter(n>=input$player_range)
        players<-data.frame(player=sort(unique(ballbyball$batsman))) %>% filter(player %in% player_seasons$batsman) %>% filter(player != "")
        updateSelectInput(session, "player_name",
                          label = "Batsmen",
                          choices = players[,1],selected = "V Kohli")
-     }else if(input$typeOfChart == "Wickets by season")
+     }else if(input$typeOfChart == "Wickets Taken")
      {
        player_seasons<-ballbyball %>% distinct(Season,bowler) %>% group_by(bowler) %>% count() %>% filter(n>=input$player_range)
        players<-data.frame(player=sort(unique(ballbyball$bowler))) %>% filter(player %in% player_seasons$bowler) %>% filter(player != "")
@@ -269,14 +269,14 @@ shinyServer(function(input, output,session) {
        updateSelectInput(session, "player_name",
                          label = "Player Of Match",
                          choices = players[,1],selected = "V Kohli")
-     }else if(input$typeOfChart == "Runs by season")
+     }else if(input$typeOfChart == "Runs Scored")
      {
        player_seasons<-ballbyball %>% distinct(Season,batsman) %>% group_by(batsman) %>% count() %>% filter(n>=input$player_range)
        players<-data.frame(player=sort(unique(ballbyball$batsman))) %>% filter(player %in% player_seasons$batsman) %>% filter(player != "")
        updateSelectInput(session, "player_name",
                          label = "Batsmen",
                          choices = players[,1],selected = "V Kohli")
-     }else if(input$typeOfChart == "Wickets by season")
+     }else if(input$typeOfChart == "Wickets Taken")
      {
        player_seasons<-ballbyball %>% distinct(Season,bowler) %>% group_by(bowler) %>% count() %>% filter(n>=input$player_range)
        players<-data.frame(player=sort(unique(ballbyball$bowler))) %>% filter(player %in% player_seasons$bowler) %>% filter(player != "")
@@ -307,13 +307,13 @@ shinyServer(function(input, output,session) {
         ggtitle(paste("Number of player of the match for", input$player_name, "across all seasons")) +
         xlab("Season") + ylab("#Player of Match Won")
       plotly::ggplotly(gg)
-    }else if(input$typeOfChart == "Runs by season")
+    }else if(input$typeOfChart == "Runs Scored")
     {
       gg<-ggplot(player_data_runsbyseason(), aes(x=Season, y = totalscore,fill = factor(Season))) + geom_boxplot() +
       ggtitle(paste("Total Runs for", input$player_name, "across all seasons")) +
         xlab("Season") + ylab("#Runs")
       plotly::ggplotly(gg)
-    }else if(input$typeOfChart == "Wickets by season")
+    }else if(input$typeOfChart == "Wickets Taken")
     {
       gg<-ggplot(data = player_data_wicketsbyseason(),aes(x=Season,y=n)) + geom_point(aes(color=factor(Season))) + geom_line() +
       ggtitle(paste("Total wickets for", input$player_name, "across all seasons")) +
