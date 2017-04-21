@@ -1,3 +1,4 @@
+
 ---
 title: "Final Project"
 author: "Ashish Jain"
@@ -10,23 +11,56 @@ output:
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library("tidyverse")
 ```
-# 'T20 Cricket Data Analysis' <br> By, Ashish Jain <br> STAT-585
+# Indian Premier League (IPL) Data Analysis <br> <br> Ashish Jain
 
-## T20 Cricket
+##T20 Cricket
+<div class="double">
+<p class="double-flow">
+* Cricket is a bat and ball game played between two teams of 11 players on a field, at the centre of which is a rectangular 22-yard long pitch.
+* At the professional level, T20 cricket was originally introduced by the England and Wales Cricket Board (ECB) in 2003 for the inter-county competition in England and Wales.
+* The two teams have a single innings each which is restricted to a maximum of 20 overs.
+* More information about T20 cricket is at [https://en.wikipedia.org/wiki/Twenty20](https://en.wikipedia.org/wiki/Twenty20).
+</p><p class="double-flow">
+<img src="Twenty20_game.jpg" class="one-col-image">
+</p>
+</div>
 
-## Indian Premire League (IPL)
+## Indian Premier League (IPL)
+<div class="double">
+<p class="double-flow">
+* IPL is a professional Twenty20 cricket league in India where teams represent Indian cities.
+* Founded by the Board of Control for Cricket in India (BCCI) in 2007.
+* There are eight teams in the league and each team plays each other twice in a home-and-away round-robin format in the league phase.
+</p><p class="double-flow">
+<img src="ipl.png" class="one-col-image">
+<img src="iplqual.png" class="one-col-image">
+</p>
+</div>
 
-## Processing of Dataset
+## Match Summary Data
+The raw data has been downloaded from [Cricsheet website](http://cricsheet.org/downloads/).
+```{r}
+matches <- read.csv("data/matches.csv", stringsAsFactors = FALSE)
+glimpse(matches)
+```
+
+## Match Ball by Ball Data
+```{r}
+ballbyball <- read.csv("data/deliveries1.csv", stringsAsFactors = FALSE)
+glimpse(ballbyball)
+```
+
+## Processing to get location Data
+```{r}
+location<-read.csv("data/location_mapping.csv", stringsAsFactors = FALSE,row.names = 1,header = T)
+location[,"city"]<-row.names(location)
+glimpse(location)
+```
 
 ##Analysis By Season 1 
 
-##Analysis By Season 2
-
 ##Analysis By Team 1
 
-##Analysis By Team 2
-
 ##Analysis By Player 1
-
-##Analysis By Player2
