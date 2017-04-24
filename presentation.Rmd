@@ -18,7 +18,7 @@ library("tidyverse")
 ##T20 Cricket
 <div class="double">
 <p class="double-flow">
-* Cricket is a bat and ball game played between two teams of 11 players on a field, at the centre of which is a rectangular 22-yard long pitch.
+* Cricket is a bat and ball game played between two teams of 11 players on a field.
 * At the professional level, T20 cricket was originally introduced by the England and Wales Cricket Board (ECB) in 2003 for the inter-county competition in England.
 * The two teams have a single innings each which is restricted to a maximum of 20 overs.
 * More information about T20 cricket is at [https://en.wikipedia.org/wiki/Twenty20](https://en.wikipedia.org/wiki/Twenty20).
