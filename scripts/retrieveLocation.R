@@ -1,6 +1,8 @@
 library(ggplot2)
 library(dplyr)
 library(tidyr)
+library(ggmap)
+library(rworldmap)
 github<-"https://raw.githubusercontent.com/ashishjain1988/STAT585-FinalProject/master/data/"
 matches <- read.csv(paste0(github,"matches.csv"), stringsAsFactors = FALSE)
 cities<-unlist(matches %>% distinct(city) %>% filter(city != ""))
