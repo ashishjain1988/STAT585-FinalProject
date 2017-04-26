@@ -8,8 +8,8 @@ library(ggmap)
 library(rworldmap)
 library(ggrepel)
 
-matches <- read.csv("../data/matches.csv", stringsAsFactors = FALSE)
-ballbyball <- read.csv("../data/deliveries1.csv", stringsAsFactors = FALSE)
+matches <- read.csv("data/matches.csv", stringsAsFactors = FALSE)
+ballbyball <- read.csv("data/deliveries1.csv", stringsAsFactors = FALSE)
 season_map_mapping<-aggregate(id ~ season, matches, c)
 
 
