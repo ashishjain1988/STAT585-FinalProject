@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Final Project</title>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="presentation_files/rmdshower/node_modules/shower-ribbon/styles/screen-4x3.css">
+  <link rel="stylesheet" href="presentation_files/rmdshower/style-common.css">
+  <link rel="stylesheet" href="presentation_files/rmdshower/style-ribbon.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.js"></script>
+  <script src="presentation_files/rmdshower/auto-render.min.js" type="text/javascript"></script>
+  
+  
+    <style type="text/css">
+   div.sourceCode { overflow-x: auto; }
+   table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+     margin: 0; padding: 0; vertical-align: baseline; border: none; }
+   table.sourceCode { width: 100%; line-height: 100%; }
+   td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+   td.sourceCode { padding-left: 5px; }
+   code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+   code > span.dt { color: #902000; } /* DataType */
+   code > span.dv { color: #40a070; } /* DecVal */
+   code > span.bn { color: #40a070; } /* BaseN */
+   code > span.fl { color: #40a070; } /* Float */
+   code > span.ch { color: #4070a0; } /* Char */
+   code > span.st { color: #4070a0; } /* String */
+   code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+   code > span.ot { color: #007020; } /* Other */
+   code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+   code > span.fu { color: #06287e; } /* Function */
+   code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+   code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+   code > span.cn { color: #880000; } /* Constant */
+   code > span.sc { color: #4070a0; } /* SpecialChar */
+   code > span.vs { color: #4070a0; } /* VerbatimString */
+   code > span.ss { color: #bb6688; } /* SpecialString */
+   code > span.im { } /* Import */
+   code > span.va { color: #19177c; } /* Variable */
+   code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+   code > span.op { color: #666666; } /* Operator */
+   code > span.bu { } /* BuiltIn */
+   code > span.ex { } /* Extension */
+   code > span.pp { color: #bc7a00; } /* Preprocessor */
+   code > span.at { color: #7d9029; } /* Attribute */
+   code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+   code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+   code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+   code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  
+  
+  
+</head>
+
+<body class="shower list">
+
+  <header class="caption">
+    <h1>Final Project</h1>
+    <p>Ashish Jain</p>
+  </header>
+
+    
+  
+<section id="indian-premier-league-ipl-data-analysis-ashish-jain" class="titleslide slide level1"><h2 class="shout">Indian Premier League (IPL) Data Analysis <br> <br> Ashish Jain</h2></section><section id="t20-cricket" class="slide level2">
+<h2>T20 Cricket</h2>
+<div class="double">
+<p class="double-flow">
+<ul>
+<li>Cricket is a bat and ball game played between two teams of 11 players on a field.</li>
+<li>At the professional level, T20 cricket was originally introduced by the England and Wales Cricket Board (ECB) in 2003 for the inter-county competition in England.</li>
+<li>The two teams have a single innings each which is restricted to a maximum of 20 overs.</li>
+<li>More information about T20 cricket is at <a href="https://en.wikipedia.org/wiki/Twenty20" class="uri">https://en.wikipedia.org/wiki/Twenty20</a>.</li>
+</ul>
+</p>
+<p class="double-flow">
+<img src="Twenty20_game.jpg" class="one-col-image">
+</p>
+</div>
+</section><section id="indian-premier-league-ipl" class="slide level2">
+<h2>Indian Premier League (IPL)</h2>
+<div class="double">
+<p class="double-flow">
+<ul>
+<li>IPL is a professional Twenty20 cricket league in India where teams represent Indian cities.</li>
+<li>Founded by the Board of Control for Cricket in India (BCCI) in 2007.</li>
+<li>There are eight teams in the league and each team plays each other twice in a home-and-away round-robin format in the league phase.</li>
+</ul>
+</p>
+<p class="double-flow">
+<img src="ipl.png" class="one-col-image"> <img src="iplqual.png" class="one-col-image">
+</p>
+</div>
+</section><section id="match-summary-data" class="slide level2">
+<h2>Match Summary Data</h2>
+<p>The raw data has been downloaded from <a href="http://cricsheet.org/downloads/">Cricsheet website</a>. The processed data is downloaded from <a href="https://www.kaggle.com/manasgarg/ipl">Kaggle</a>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">matches &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/matches.csv&quot;</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)
+<span class="kw">glimpse</span>(matches)</code></pre></div>
+<pre><code>## Observations: 577
+## Variables: 18
+## $ id              &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,...
+## $ season          &lt;int&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008...
+## $ city            &lt;chr&gt; &quot;Bangalore&quot;, &quot;Chandigarh&quot;, &quot;Delhi&quot;, &quot;Mumbai&quot;, ...
+## $ date            &lt;chr&gt; &quot;2008-04-18&quot;, &quot;2008-04-19&quot;, &quot;2008-04-19&quot;, &quot;200...
+## $ team1           &lt;chr&gt; &quot;Kolkata Knight Riders&quot;, &quot;Chennai Super Kings&quot;...
+## $ team2           &lt;chr&gt; &quot;Royal Challengers Bangalore&quot;, &quot;Kings XI Punja...
+## $ toss_winner     &lt;chr&gt; &quot;Royal Challengers Bangalore&quot;, &quot;Chennai Super ...
+## $ toss_decision   &lt;chr&gt; &quot;field&quot;, &quot;bat&quot;, &quot;bat&quot;, &quot;bat&quot;, &quot;bat&quot;, &quot;bat&quot;, &quot;b...
+## $ result          &lt;chr&gt; &quot;normal&quot;, &quot;normal&quot;, &quot;normal&quot;, &quot;normal&quot;, &quot;norma...
+## $ dl_applied      &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0...
+## $ winner          &lt;chr&gt; &quot;Kolkata Knight Riders&quot;, &quot;Chennai Super Kings&quot;...
+## $ win_by_runs     &lt;int&gt; 140, 33, 0, 0, 0, 0, 0, 6, 0, 66, 0, 0, 0, 0, ...
+## $ win_by_wickets  &lt;int&gt; 0, 0, 9, 5, 5, 6, 9, 0, 3, 0, 7, 9, 10, 4, 0, ...
+## $ player_of_match &lt;chr&gt; &quot;BB McCullum&quot;, &quot;MEK Hussey&quot;, &quot;MF Maharoof&quot;, &quot;M...
+## $ venue           &lt;chr&gt; &quot;M Chinnaswamy Stadium&quot;, &quot;Punjab Cricket Assoc...
+## $ umpire1         &lt;chr&gt; &quot;Asad Rauf&quot;, &quot;MR Benson&quot;, &quot;Aleem Dar&quot;, &quot;SJ Dav...
+## $ umpire2         &lt;chr&gt; &quot;RE Koertzen&quot;, &quot;SL Shastri&quot;, &quot;GA Pratapkumar&quot;,...
+## $ umpire3         &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA...</code></pre>
+</section><section id="match-ball-by-ball-data" class="slide level2">
+<h2>Match Ball by Ball Data</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ballbyball &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/deliveries1.csv&quot;</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)
+<span class="kw">glimpse</span>(ballbyball)</code></pre></div>
+<pre><code>## Observations: 136,598
+## Variables: 22
+## $ match_id         &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+## $ inning           &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+## $ batting_team     &lt;chr&gt; &quot;Kolkata Knight Riders&quot;, &quot;Kolkata Knight Ride...
+## $ bowling_team     &lt;chr&gt; &quot;Royal Challengers Bangalore&quot;, &quot;Royal Challen...
+## $ over             &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, ...
+## $ ball             &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 1, 2, ...
+## $ batsman          &lt;chr&gt; &quot;SC Ganguly&quot;, &quot;BB McCullum&quot;, &quot;BB McCullum&quot;, &quot;...
+## $ non_striker      &lt;chr&gt; &quot;BB McCullum&quot;, &quot;SC Ganguly&quot;, &quot;SC Ganguly&quot;, &quot;S...
+## $ bowler           &lt;chr&gt; &quot;P Kumar&quot;, &quot;P Kumar&quot;, &quot;P Kumar&quot;, &quot;P Kumar&quot;, &quot;...
+## $ is_super_over    &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...
+## $ wide_runs        &lt;int&gt; 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...
+## $ bye_runs         &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...
+## $ legbye_runs      &lt;int&gt; 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, ...
+## $ noball_runs      &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...
+## $ penalty_runs     &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...
+## $ batsman_runs     &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 6, 4, 0, 0, 0, ...
+## $ extra_runs       &lt;int&gt; 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, ...
+## $ total_runs       &lt;int&gt; 1, 0, 1, 0, 0, 0, 1, 0, 4, 4, 6, 4, 0, 0, 0, ...
+## $ player_dismissed &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;...
+## $ dismissal_kind   &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;...
+## $ fielder          &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;...
+## $ Season           &lt;int&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 200...</code></pre>
+</section><section id="venue-location-data-processing" class="slide level2">
+<h2>Venue Location Data Processing</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;ggmap&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;rworldmap&quot;</span>)
+cities&lt;-<span class="kw">unlist</span>(matches %&gt;%<span class="st"> </span><span class="kw">distinct</span>(city) %&gt;%<span class="st"> </span><span class="kw">filter</span>(city !=<span class="st"> &quot;&quot;</span>))
+location&lt;-<span class="kw">geocode</span>(cities)
+<span class="kw">row.names</span>(location)&lt;-cities
+location&lt;-location[,<span class="dv">2</span>:<span class="dv">3</span>]
+coord2loc &lt;-<span class="st"> </span>function(points)
+{
+  countriesSP &lt;-<span class="st"> </span><span class="kw">getMap</span>(<span class="dt">resolution=</span><span class="st">&#39;low&#39;</span>)
+  pointsSP =<span class="st"> </span><span class="kw">SpatialPoints</span>(points, <span class="dt">proj4string=</span><span class="kw">CRS</span>(<span class="kw">proj4string</span>(countriesSP)))  
+  indices =<span class="st"> </span><span class="kw">over</span>(pointsSP, countriesSP)
+  indices$ADMIN  <span class="co">#returns country name</span>
+}
+countries&lt;-<span class="kw">coord2loc</span>(<span class="kw">as.matrix</span>(location))
+location[,<span class="dv">3</span>]&lt;-countries
+location[<span class="st">&quot;Kochi&quot;</span>,]$V3&lt;-<span class="st">&quot;India&quot;</span>
+location[,<span class="st">&quot;city&quot;</span>]&lt;-<span class="kw">row.names</span>(location)
+<span class="kw">glimpse</span>(location)</code></pre></div>
+<pre><code>## Observations: 30
+## Variables: 4
+## $ lon  &lt;dbl&gt; 77.59456, 76.77942, 77.10249, 72.87766, 88.36390, 75.7872...
+## $ lat  &lt;dbl&gt; 12.971599, 30.733315, 28.704059, 19.075984, 22.572646, 26...
+## $ V3   &lt;fctr&gt; India, India, India, India, India, India, India, India, ...
+## $ city &lt;chr&gt; &quot;Bangalore&quot;, &quot;Chandigarh&quot;, &quot;Delhi&quot;, &quot;Mumbai&quot;, &quot;Kolkata&quot;, ...</code></pre>
+</section><section id="r-packages-used" class="slide level2">
+<h2>R Packages Used</h2>
+<ul>
+<li><code>dplyr</code></li>
+<li><code>tidyr</code></li>
+<li><code>shiny</code></li>
+<li><code>ggmap</code></li>
+<li><code>rworldmap</code></li>
+<li><code>ggplot</code></li>
+<li><code>plotly</code></li>
+<li><code>ggrepel</code></li>
+</ul>
+</section>
+<section id="shiny-application" class="titleslide slide level1"><h2 class="shout">Shiny Application</h2></section></section>
+<section id="thank-you" class="titleslide slide level1"><h2 class="shout">Thank You!!</h2></section></section>
+
+  <!--
+  To hide progress bar from entire presentation
+  just remove “progress” element.
+  -->
+  <!-- <div class="progress"></div> -->
+  <script src="presentation_files/rmdshower/node_modules/shower/node_modules/shower-core/shower.min.js"></script>
+  <!-- Copyright © 2015 Yours Truly, Famous Inc. -->
+  <!-- Photos by John Carey, fiftyfootshadows.net -->
+
+    <script>renderMathInElement(document.body);</script>
+  
+  
+</body>
+</html>
