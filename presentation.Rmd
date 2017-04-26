@@ -9,7 +9,11 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(
+    echo = TRUE,
+    message = FALSE,
+    warning = FALSE
+)
 library("tidyverse")
 ```
 
@@ -52,13 +56,38 @@ ballbyball <- read.csv("data/deliveries1.csv", stringsAsFactors = FALSE)
 glimpse(ballbyball)
 ```
 
-## Venue Location Data
+## Venue Location Data Processing
 ```{r}
-location<-read.csv("data/location_mapping.csv", stringsAsFactors = FALSE,row.names = 1,header = T)
+library("ggmap")
+library("rworldmap")
+cities<-unlist(matches %>% distinct(city) %>% filter(city != ""))
+location<-geocode(cities)
+row.names(location)<-cities
+location<-location[,2:3]
+coord2loc <- function(points)
+{
+  countriesSP <- getMap(resolution='low')
+  pointsSP = SpatialPoints(points, proj4string=CRS(proj4string(countriesSP)))  
+  indices = over(pointsSP, countriesSP)
+  indices$ADMIN  #returns country name
+}
+countries<-coord2loc(as.matrix(location))
+location[,3]<-countries
+location["Kochi",]$V3<-"India"
 location[,"city"]<-row.names(location)
 glimpse(location)
 ```
 
-# Shiny Application 
+##R Packages Used
+* `dplyr`
+* `tidyr`
+* `shiny`
+* `ggmap`
+* `rworldmap`
+* `ggplot`
+* `plotly`
+* `ggrepel`
+
+# Shiny Application
 
 # Thank You!!
