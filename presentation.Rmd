@@ -17,13 +17,13 @@ knitr::opts_chunk$set(
 library("tidyverse")
 ```
 
-# Indian Premier League (IPL) Data Analysis <br> <br> Ashish Jain
+# T20 Cricket: IPL Data Analysis <br> <br> Ashish Jain
 
 ##T20 Cricket
 <div class="double">
 <p class="double-flow">
 * Cricket is a bat and ball game played between two teams of 11 players on a field.
-* At the professional level, T20 cricket was originally introduced by the England and Wales Cricket Board (ECB) in 2003 for the inter-county competition in England.
+* At the professional level, T20 cricket was originally introduced by the England and Wales Cricket Board (ECB) in 2003.
 * The two teams have a single innings each which is restricted to a maximum of 20 overs.
 * More information about T20 cricket is at [https://en.wikipedia.org/wiki/Twenty20](https://en.wikipedia.org/wiki/Twenty20).
 </p><p class="double-flow">
@@ -78,6 +78,8 @@ location[,"city"]<-row.names(location)
 glimpse(location)
 ```
 
+# Shiny Application
+
 ##R Packages Used
 * `dplyr`
 * `tidyr`
@@ -87,7 +89,5 @@ glimpse(location)
 * `ggplot`
 * `plotly`
 * `ggrepel`
-
-# Shiny Application
 
 # Thank You!!
