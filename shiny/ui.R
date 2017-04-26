@@ -8,9 +8,11 @@ library(ggmap)
 library(rworldmap)
 library(ggrepel)
 
-matches <- read.csv("../data/matches.csv", stringsAsFactors = FALSE)
-ballbyball <- read.csv("../data/deliveries1.csv", stringsAsFactors = FALSE)
-season_map_mapping<-aggregate(id ~ season, matches, c)
+matches <- readRDS("matches.rds")
+ballbyball <- readRDS("ballbyball.rds")
+#season_map_mapping<-aggregate(id ~ season, matches, c)
+#dataset<-merge(matches,ballbyball,by.x="id",by.y="match_id")
+location<-readRDS("location.rds")
 
 
 shinyUI(navbarPage("T20 Cricket - Indian Premier League (IPL)",
@@ -63,8 +65,8 @@ shinyUI(navbarPage("T20 Cricket - Indian Premier League (IPL)",
                               sliderInput("player_range", "Seasons Played:", min = 1, max = 9, value = 5),
                               radioButtons("typeOfChart", label = "Type of Chart",
                                            choices = list("Player of the match",
-                                                              "Runs Scored",
-                                                              "Wickets Taken"
+                                                          "Runs Scored",
+                                                          "Wickets Taken"
                                            ))
                             ),
                             mainPanel(
