@@ -53,7 +53,7 @@ shinyServer(function(input, output,session) {
   })
   output$stat_avgteamruns <- renderPlotly({
     gg<-ggplot(stat_data_avgteamruns(), aes(x=batting_team, y = totalscore,fill = batting_team)) + geom_boxplot() +
-      ggtitle(paste("Number of tosses won by the teams in ", input$team_year,"season")) +
+      ggtitle(paste("Average Number of runs scored by the teams in ", input$team_year,"season")) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Teams") + ylab("#Total Score")
     plotly::ggplotly(gg)
   })
@@ -177,7 +177,7 @@ shinyServer(function(input, output,session) {
   })
   output$team_avgteamruns <- renderPlotly({
     gg<-ggplot(team_data_avgteamruns(), aes(x=Season, y = totalscore,fill = factor(Season))) + geom_boxplot() +
-      ggtitle(paste("Number of tosses won by the teams in", input$team_year,"season")) +
+      ggtitle(paste("Average Number of runs scored by the teams in", input$team_year,"season")) +
       xlab("Season") + ylab("#Total Score") + xlim(c(2008,2016))
     plotly::ggplotly(gg)
   })
@@ -309,7 +309,7 @@ shinyServer(function(input, output,session) {
     }else if(input$typeOfChart == "Runs Scored")
     {
       gg<-ggplot(player_data_runsbyseason(), aes(x=Season, y = totalscore,fill = factor(Season))) + geom_boxplot() +
-        ggtitle(paste("Total Runs for", input$player_name, "across all seasons")) +
+        ggtitle(paste("Average number of Runs for", input$player_name, "across all seasons")) +
         xlab("Season") + ylab("#Runs") + xlim(c(2008,2016))
       plotly::ggplotly(gg)
     }else if(input$typeOfChart == "Wickets Taken")
