@@ -44,7 +44,7 @@ library("tidyverse")
 </div>
 
 ## Match Summary Data
-The raw data has been downloaded from [Cricsheet website](http://cricsheet.org/downloads/). The processed data is downloaded from [Kaggle](https://www.kaggle.com/manasgarg/ipl).
+The raw data is available at [Cricsheet website](http://cricsheet.org/downloads/). The processed data has been downloaded from [Kaggle](https://www.kaggle.com/manasgarg/ipl).
 ```{r}
 matches <- read.csv("data/matches.csv", stringsAsFactors = FALSE)
 glimpse(matches)
