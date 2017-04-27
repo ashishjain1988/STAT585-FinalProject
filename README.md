@@ -1,4 +1,4 @@
-# Indian Premier League (IPL) data visulization and analysis 
+# Indian Premier League (IPL) data visualization and analysis 
 **Introduction**
 
 Cricket is one of the most popular and played sports in India. There are three standard types of cricket matches, Five-day match (Test Match), 50 overs match (One day match), and Twenty overs match (T20). Although all formats are quite popular but during the last decade, the popularity of the T20 matches has increased exponentially. The main reason for the popularity of T20 matches is more action in short time. The introduction of various T20 tournaments has also added to its popularity. Indian Premier League (IPL) is the biggest event among all the T20 tournaments across the globe. It is an annual tournament and consists of two stages. In the first or the league stage, each team plays against the other team twice. In the second stage, the top four teams after the league stage compete for the title. We are going to use the IPL data from the year 2008 to 2016. The raw data is available at [Cricsheet website](http://cricsheet.org/downloads/). The raw data consists ball by ball details individually for every match (577 files). The processed data has been downloaded from [Kaggle](https://www.kaggle.com/manasgarg/ipl). For carrying out the analysis we have divided this project into two parts. In the first part, we will further process the data so that it can be used for the next part (visualization and analysis). In the next part, we will develop a shiny application in which the data can be analyzed by plotting and changing various parameters including year, team, and player.
@@ -20,7 +20,7 @@ You need R version above 3.0 to run this application. In addition, this package 
 * Download or fork the github repository.
 * Open the R terminal.
 * Set the current path of the directory to the shiny application for example `setwd("/Users/jain/STAT585/STAT585-FinalProject/shiny")`
-* Run Application by typing `runApp()`
+* Run Application by `runApp()`
 
 **IPL seasons analysis**
 
