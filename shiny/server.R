@@ -153,7 +153,7 @@ shinyServer(function(input, output,session) {
     team_seasons<-matches %>% gather(key=team,value=teamname,c(5:6)) %>% distinct(season,teamname) %>% group_by(teamname) %>% count() %>% filter(n>=input$team_range1)
     updateSelectInput(session, "team_team",
                       label = "Team",
-                      choices = team_seasons$teamname)
+                      choices = team_seasons$teamname,selected = "Rajasthan Royals")
   })
   
   team_data_tosswon <- reactive({
